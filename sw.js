@@ -1,8 +1,8 @@
 const CACHE_NAME = 'space-suite-v1';
 const ASSETS = [
   '/',
-  '/index.html',
-  '/style.css'
+  'index.html',
+  'style.css'
 ];
 
 // Install the service worker and cache basic layouts
