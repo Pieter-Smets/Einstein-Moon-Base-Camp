@@ -1,35 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Lunar Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="style.css">
+    
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            
-            font-family: Arial, sans-serif;
-            color: white;
-        }
         #map-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
+            display: block; 
+            height: 55vh; 
+            width: 100%;
+            position: relative;
+            margin-top: 1rem;
         }
         #map { 
-            height: 70vh; 
-            width: 80vw; 
-            border: 2px solid #1f2833;
-            border-radius: 8px;
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.5);
+            height: 100%; 
+            width: 100%; 
+            background-color: #0b0c10; /* Clean placeholder dark match while tiles load */
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.5);
         }
-        h2 {
-            margin-bottom: 10px;
+        
+        /* Coordinate inputs grouping dashboard container styling */
+        .coordinate-bar {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        .coord-input-group {
+            flex: 1;
+            min-width: 140px;
+        }
+        .coord-input-group label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+        .coord-input-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--background);
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+        .go-btn {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: #ffffff;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            height: 45px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .go-btn:hover {
+            background-color: var(--primary-hover);
+        }
+        .go-btn:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
@@ -37,38 +82,106 @@
 
     <div class="container" style="margin: 2rem auto; max-width: 1100px; height: auto;">
         <div class="nav-bar">
-            <a href="index.html" class="nav-back-btn" style="color: #94a3b8;">← Back to Dashboard</a>
+            <a href="index.html" class="nav-back-btn" style="text-decoration: none; color: var(--primary); font-weight: bold;">← Back to Dashboard</a>
         </div>
         
-        <header style="border-bottom: 2px solid #1f2833;">
-            <h1 style="color: #38bdf8; font-size: 2.25rem; margin-bottom: 0.5rem;">Lunar Elevation Map</h1>
-            <p style="color: #94a3b8;">Explore topographic variants using NASA LRO/LOLA data structures.</p>
+        <header style="margin-top: 1rem;">
+            <h1 style="color: var(--primary); font-size: 2.25rem; margin-bottom: 0.5rem;">Lunar Elevation Map</h1>
+            <p style="color: var(--text-muted);">Explore topographic variations using NASA LRO/LOLA data structures.</p>
         </header>
         
-        <div id="map-container" style="display: block; height: 60vh; position: relative;">
-            <div id="map" style="height: 100%; width: 100%;"></div>
+        <div class="coordinate-bar">
+            <div class="coord-input-group">
+                <label for="input-lat">Latitude (-90 to 90)</label>
+                <input type="number" id="input-lat" placeholder="e.g. -12.4571" step="0.0001" min="-90" max="90">
+            </div>
+            <div class="coord-input-group">
+                <label for="input-lng">Longitude (-180 to 180)</label>
+                <input type="number" id="input-lng" placeholder="e.g. 43.6120" step="0.0001" min="-180" max="180">
+            </div>
+            <button id="btn-go" class="go-btn">Go to Target</button>
+        </div>
+        
+        <div id="map-container">
+            <div id="map"></div>
         </div>
     </div>
 
     <script>
-
-        // 1. Tell Leaflet to use EPSG:4326 (Plate Carrée / Simple Cylindrical) 
-        // instead of default Web Mercator.
+        // 1. Configure Leaflet to use Lunar EPSG:4326 (Plate Carrée / Simple Cylindrical)
         var map = L.map('map', {
             crs: L.CRS.EPSG4326,
             minZoom: 1,
             maxZoom: 8
         }).setView([0, 0], 2);
 
-        // 2. Connect directly to the USGS MapServer with strict parameters included
-        L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv', {
-            map: '/maps/earth/moon_simp_cyl.map',
+        // 2. Render target USGS NASA Lunar WMS Tile sets (CORRECT STRINGS INTEGRATED)
+        L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
             layers: 'LOLA_color',
-            styles: '',          // FIX: explicitly pass empty string for default style
             format: 'image/png',
-            transparent: true,
-            attribution: 'USGS Astrogeology | NASA LRO/LOLA'
+            transparent: false,
+            attribution: 'USGS Planetary Mapping / NASA LRO'
         }).addTo(map);
+
+        // SAFEGUARD: Force Leaflet to recalculate visual sizes right after DOM settles
+        setTimeout(function() {
+            map.invalidateSize();
+        }, 150);
+
+        // Keep variable track of our active coordinate marker pin
+        let searchMarker = null;
+
+        // 3. Coordinate navigation logic handler
+        document.getElementById('btn-go').addEventListener('click', function() {
+            const latInput = document.getElementById('input-lat').value;
+            const lngInput = document.getElementById('input-lng').value;
+            
+            const lat = parseFloat(latInput);
+            const lng = parseFloat(lngInput);
+
+            // Validation guards
+            if (isNaN(lat) || isNaN(lng)) {
+                alert('Please provide valid numerical coordinates for both fields.');
+                return;
+            }
+            if (lat < -90 || lat > 90) {
+                alert('Error: Latitude must be a value between -90 and 90 degrees.');
+                return;
+            }
+            if (lng < -180 || lng > 180) {
+                alert('Error: Longitude must be a value between -180 and 180 degrees.');
+                return;
+            }
+
+            // Recalculate size bounds before shifting the viewfinder frame
+            map.invalidateSize();
+
+            // Snap view to targeted locations smoothly
+            const targetedZoom = map.getZoom() < 5 ? 5 : map.getZoom();
+            map.setView([lat, lng], targetedZoom);
+
+            // Create or move vector telemetry targeting point
+            if (searchMarker) {
+                searchMarker.setLatLng([lat, lng]);
+            } else {
+                searchMarker = L.circleMarker([lat, lng], {
+                    radius: 12,            
+                    color: '#2563eb',      // Matches theme dashboard primary accent colors
+                    fillColor: '#2563eb',  
+                    fillOpacity: 0.3,      
+                    weight: 2             
+                }).addTo(map);
+            }
+
+            // Spawn information tooltip display box
+            searchMarker.bindPopup(`
+                <div style="color: #1e293b; font-family: sans-serif; font-size: 0.9rem; line-height: 1.4;">
+                    <strong style="color: #2563eb;">Target Coordinates Locked</strong><br>
+                    <span style="color: #64748b;">Latitude:</span> <strong>${lat.toFixed(4)}°</strong><br>
+                    <span style="color: #64748b;">Longitude:</span> <strong>${lng.toFixed(4)}°</strong>
+                </div>
+            `).openPopup();
+        });
     </script>
 </body>
 </html>
