@@ -1,34 +1,151 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Lunar Settlement Suitability GIS</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #1a1a2e; color: #fff; display: flex; padding: 20px; margin: 0; height: 95vh; }
-        .sidebar { width: 300px; padding: 20px; background-color: #16213e; border-radius: 10px; margin-right: 20px; height: fit-content; }
-        .map-view { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #0f3460; border-radius: 10px; padding: 20px; position: relative; }
-        
-        input[type="range"] { width: 100%; margin: 10px 0 20px 0; }
-        input[type="number"] { width: 90%; padding: 8px; margin-bottom: 15px; background: #1a1a2e; color: white; border: 1px solid #0f3460; border-radius: 4px; }
-        button.action-btn { background-color: #e94560; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; border-radius: 5px; font-size: 14px; }
-        button.action-btn:hover { background-color: #ff5775; }
-        
-        img { max-height: 65vh; max-width: 100%; border-radius: 5px; box-shadow: 0px 4px 15px rgba(0,0,0,0.5); }
-        #status-text { font-size: 16px; color: #8a99ad; font-weight: bold; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a2e;
+            color: #fff;
+            display: flex;
+            padding: 20px;
+            margin: 0;
+            height: 95vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            padding: 20px;
+            background-color: #16213e;
+            border-radius: 10px;
+            margin-right: 20px;
+            height: fit-content;
+        }
+
+        .map-view {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #0f3460;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0 20px 0;
+        }
+
+        input[type="number"] {
+            width: 90%;
+            padding: 8px;
+            margin-bottom: 15px;
+            background: #1a1a2e;
+            color: white;
+            border: 1px solid #0f3460;
+            border-radius: 4px;
+        }
+
+        button.action-btn {
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button.action-btn:hover {
+            background-color: #ff5775;
+        }
+
+        img {
+            max-height: 65vh;
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        #status-text {
+            font-size: 16px;
+            color: #8a99ad;
+            font-weight: bold;
+        }
 
         /* Map Toggle Controls */
-        .toggle-container { margin-top: 20px; display: none; background: #16213e; border-radius: 8px; padding: 5px; }
-        .toggle-btn { background: transparent; border: none; color: #8a99ad; padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 5px; transition: 0.3s; }
-        .toggle-btn.active { background: #0f3460; color: white; box-shadow: 0px 2px 5px rgba(0,0,0,0.3); }
-        .toggle-btn:hover:not(.active) { color: white; }
+        .toggle-container {
+            margin-top: 20px;
+            display: none;
+            background: #16213e;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: #8a99ad;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: #0f3460;
+            color: white;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-btn:hover:not(.active) {
+            color: white;
+        }
 
         /* Global Telemetry Status Box */
-        .comm-badge { display: none; background: #16213e; padding: 12px 25px; border-radius: 30px; margin-bottom: 15px; font-weight: bold; align-items: center; border: 1px solid #233154; }
-        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 12px; }
-        .status-good { background-color: #00ff88; box-shadow: 0 0 8px #00ff88; }
-        .status-warn { background-color: #ffcc00; box-shadow: 0 0 8px #ffcc00; }
-        .status-bad { background-color: #ff3366; box-shadow: 0 0 8px #ff3366; }
+        .comm-badge {
+            display: none;
+            background: #16213e;
+            padding: 12px 25px;
+            border-radius: 30px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            align-items: center;
+            border: 1px solid #233154;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 12px;
+        }
+
+        .status-good {
+            background-color: #00ff88;
+            box-shadow: 0 0 8px #00ff88;
+        }
+
+        .status-warn {
+            background-color: #ffcc00;
+            box-shadow: 0 0 8px #ffcc00;
+        }
+
+        .status-bad {
+            background-color: #ff3366;
+            box-shadow: 0 0 8px #ff3366;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="sidebar">
@@ -36,10 +153,10 @@
         <p>Target Center Coordinates:</p>
         <label>Latitude (-90 to 90):</label>
         <input type="number" id="lat" value="-0.6" step="0.1">
-        
+
         <label>Longitude (-180 to 180):</label>
         <input type="number" id="lon" value="23.4" step="0.1">
-        
+
         <label>Scan Scale Width (km):</label>
         <input type="number" id="scale" value="150">
 
@@ -61,20 +178,30 @@
             Earth Link: <span id="comm-text" style="margin-left: 5px; color: #8a99ad;">Checking...</span>
         </div>
 
-        <p id="status-text">Adjust baseline criteria weights and select "Scan Surface Terrain" to begin raster calculations.</p>
+        <p id="status-text">Adjust baseline criteria weights and select "Scan Surface Terrain" to begin raster
+            calculations.</p>
         <img id="map-display" src="" style="display: none;">
-        
+
         <div class="toggle-container" id="toggle-bar">
-            <button class="toggle-btn active" id="btn-heatmap" onclick="switchView('heatmap')">Suitability Heatmap</button>
-            <button class="toggle-btn" id="btn-original" onclick="switchView('original')">Original Elevation Map</button>
+            <button class="toggle-btn active" id="btn-heatmap" onclick="switchView('heatmap')">Suitability
+                Heatmap</button>
+            <button class="toggle-btn" id="btn-original" onclick="switchView('original')">Original Elevation
+                Map</button>
         </div>
-        <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
-    <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a> 
-    © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under 
-    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
-    <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" 
-    style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;">
-</footer>
+        <footer
+            style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+            <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a>
+            © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+            <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;">
+        </footer>
     </div>
 
     <script>
@@ -91,7 +218,7 @@
             const statusText = document.getElementById('status-text');
             const toggleBar = document.getElementById('toggle-bar');
             const commBadge = document.getElementById('comm-badge');
-            
+
             imgDisplay.style.display = 'none';
             toggleBar.style.display = 'none';
             commBadge.style.display = 'none';
@@ -99,7 +226,7 @@
             statusText.innerText = "Processing topographic spatial matrices... Please wait.";
 
             const apiUrl = `/calculate-settlement?lat=${lat}&lon=${lon}&scale=${scale}&w_flat=${w_flat}&w_elev=${w_elev}`;
-            
+
             fetch(apiUrl)
                 .then(response => {
                     if (!response.ok) return response.json().then(err => { throw new Error(err.error || "Server error"); });
@@ -108,17 +235,17 @@
                 .then(data => {
                     memoryImages.original = data.original;
                     memoryImages.heatmap = data.heatmap;
-                    
+
                     statusText.style.display = 'none';
                     toggleBar.style.display = 'inline-block';
-                    
+
                     // Update the Telemetry Badge Display
                     const commDot = document.getElementById('comm-dot');
                     const commText = document.getElementById('comm-text');
-                    
+
                     commText.innerText = `${data.comm_status} (${data.comm_percent}%)`;
                     commDot.className = "indicator-dot"; // reset classes
-                    
+
                     if (data.comm_percent > 75) {
                         commDot.classList.add('status-good');
                     } else if (data.comm_percent > 0) {
@@ -126,7 +253,7 @@
                     } else {
                         commDot.classList.add('status-bad');
                     }
-                    
+
                     commBadge.style.display = 'flex';
                     switchView('heatmap');
                     imgDisplay.style.display = 'block';
@@ -155,4 +282,5 @@
     </script>
 
 </body>
+
 </html>

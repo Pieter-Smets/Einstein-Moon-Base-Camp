@@ -1,85 +1,99 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Algen Bioreactor & Habitat Simulator</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <div class="container">
-    <div class="nav-bar">
-        <a href="index.html" class="nav-back-btn">← Terug naar Dashboard</a>
-    </div>
-    <header>
-        <h1>Algen Bioreactor Simulator</h1>
+        <div class="nav-bar">
+            <a href="index.html" class="nav-back-btn">← Terug naar Dashboard</a>
+        </div>
+        <header>
+            <h1>Algen Bioreactor Simulator</h1>
             <p>Bereken de benodigde hoeveelheid algen en water om de habitat van zuurstof te voorzien.</p>
         </header>
-        
+
         <div class="main-layout">
             <div>
                 <h2 class="section-title">Inputgegevens</h2>
-                
+
                 <div class="input-group">
                     <label for="zuurstofverbruik">Zuurstofverbruik / persoon / dag (kg)</label>
                     <input type="number" id="zuurstofverbruik" value="0.84" step="0.01" min="0">
                 </div>
-                
+
                 <div class="input-group">
                     <label for="astronauten">Aantal astronauten</label>
                     <input type="number" id="astronauten" value="4" step="1" min="0">
                 </div>
-                
+
                 <div class="input-group">
                     <label for="concentratie">Concentratie algen (kg/l)</label>
                     <input type="number" id="concentratie" value="0.002" step="0.0001" min="0.00001">
                 </div>
-                
+
                 <div class="input-group">
                     <label for="productie">Productie algen/dag (factor)</label>
                     <input type="number" id="productie" value="1.5" step="0.1" min="0">
                 </div>
-                
+
                 <button class="launch-btn" id="launchBtn">Activeer Systemen</button>
             </div>
-            
+
             <div class="output-card">
                 <div>
-                    <h2 class="section-title" style="color: var(--text-main); margin-bottom: 1.5rem;">Simulatie Resultaten</h2>
+                    <h2 class="section-title" style="color: var(--text-main); margin-bottom: 1.5rem;">Simulatie
+                        Resultaten</h2>
                     <div class="output-grid">
                         <div class="output-box">
                             <div class="label">Zuurstofnood / dag</div>
-                            <div class="value"><span id="outZuurstofnood">0.00</span> <span style="font-size: 0.8rem; color: var(--text-muted);">kg</span></div>
+                            <div class="value"><span id="outZuurstofnood">0.00</span> <span
+                                    style="font-size: 0.8rem; color: var(--text-muted);">kg</span></div>
                         </div>
                         <div class="output-box">
                             <div class="label">Massa algen</div>
-                            <div class="value"><span id="outMassaAlgen">0.00</span> <span style="font-size: 0.8rem; color: var(--text-muted);">kg</span></div>
+                            <div class="value"><span id="outMassaAlgen">0.00</span> <span
+                                    style="font-size: 0.8rem; color: var(--text-muted);">kg</span></div>
                         </div>
                         <div class="output-box" style="grid-column: span 2; margin-top: 0.5rem;">
                             <div class="label">Benodigd volume water</div>
-                            <div class="value"><span id="outVolumeWater">0.00</span> <span style="font-size: 0.9rem; color: var(--text-muted);">Liter</span></div>
+                            <div class="value"><span id="outVolumeWater">0.00</span> <span
+                                    style="font-size: 0.9rem; color: var(--text-muted);">Liter</span></div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div style="margin-top: 2rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
-                    <strong>Systeeminformatie:</strong> De bioreactor past zich automatisch aan op basis van de ingevoerde parameters om een stabiel levensbehoud te garanderen.
+                    <strong>Systeeminformatie:</strong> De bioreactor past zich automatisch aan op basis van de
+                    ingevoerde parameters om een stabiel levensbehoud te garanderen.
                 </div>
             </div>
-            
+
             <div class="visualizer-container">
                 <div class="visualizer-title">Live Bioreactor & O₂ Stroming Status</div>
                 <canvas id="bioreactorCanvas" width="800" height="350"></canvas>
             </div>
         </div>
-        <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
-    <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a> 
-    © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under 
-    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
-    <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" 
-    style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;">
-</footer>
+        <footer
+            style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+            <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a>
+            © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+            <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;">
+        </footer>
     </div>
 
     <script>
@@ -104,7 +118,7 @@
         let dynamicWaterLevel = 0; // Groeit naar het juiste niveau toe
 
         // Bubbles generator voor in de bioreactor tank
-        for(let i = 0; i < 30; i++) {
+        for (let i = 0; i < 30; i++) {
             bubbles.push({
                 x: 80 + Math.random() * 140,
                 y: Math.random() * 250 + 70,
@@ -123,10 +137,10 @@
             // Formules:
             // zuurstofnood/dag = aantal astronauten * zuurstofverbruik
             const zuurstofnood = aantalAstronauten * zuurstofPerPersoon;
-            
+
             // massa algen = zuurstofnood * productie algen/dag factor
             const massaAlgen = zuurstofnood * productieFactor;
-            
+
             // volume water = massa algen / concentratie algen
             const volumeWater = concentratie > 0 ? (massaAlgen / concentratie) : 0;
 
@@ -153,7 +167,7 @@
         // Animatie Loop
         function drawSimulation() {
             const data = calculate();
-            
+
             // Canvas opschonen
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -171,7 +185,7 @@
             if (dynamicWaterLevel > 5) {
                 ctx.fillStyle = 'rgba(22, 163, 74, 0.25)'; // Algen groen
                 ctx.fillRect(tankX + 5, tankY + tankHeight - dynamicWaterLevel, tankWidth - 10, dynamicWaterLevel);
-                
+
                 // Extra felle groene gloed aan de oppervlakte
                 ctx.fillStyle = 'rgba(21, 128, 61, 0.4)';
                 ctx.fillRect(tankX + 5, tankY + tankHeight - dynamicWaterLevel, tankWidth - 10, 4);
@@ -251,7 +265,7 @@
             // --- 3. TEKEN DE HABITAT / CREW (RECHTS) ---
             const habX = 450;
             const habY = 140;
-            
+
             // Koepel / Habitat basis
             ctx.beginPath();
             ctx.arc(habX + 100, habY + 110, 100, Math.PI, 2 * Math.PI);
@@ -298,4 +312,5 @@
         requestAnimationFrame(drawSimulation);
     </script>
 </body>
+
 </html>

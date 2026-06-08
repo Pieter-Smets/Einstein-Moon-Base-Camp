@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,14 +66,15 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
-    <div class="nav-bar">
-        <a href="index.html" class="nav-back-btn">← Terug naar Dashboard</a>
-    </div>
-    <h1 style="text-align: center; color: var(--text-main);">Centrifuge Simulator</h1>
-        
+        <div class="nav-bar">
+            <a href="index.html" class="nav-back-btn">← Terug naar Dashboard</a>
+        </div>
+        <h1 style="text-align: center; color: var(--text-main);">Centrifuge Simulator</h1>
+
         <div class="grid-layout">
             <div class="data-column">
                 <div class="inputs-section">
@@ -115,13 +117,20 @@
                 <canvas id="centrifugeCanvas" width="350" height="350"></canvas>
             </div>
         </div>
-        <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
-    <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a> 
-    © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under 
-    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
-    <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" 
-    style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;">
-</footer>
+        <footer
+            style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+            <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a>
+            © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+            <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;">
+        </footer>
     </div>
 
     <script>
@@ -151,13 +160,13 @@
                 // Spreadsheet formulas:
                 // Snelheid = WORTEL(B3*B2) -> sqrt(gravity * length)
                 const snelheid = Math.sqrt(gravity * length);
-                
+
                 // Hoeksnelheid = B6/B2 -> snelheid / length
                 const hoeksnelheid = snelheid / length;
-                
+
                 // Frequentie = B7/(2*PI()) -> hoeksnelheid / (2 * PI)
                 const frequentie = hoeksnelheid / (2 * Math.PI);
-                
+
                 // Periode = 1/B8 -> 1 / frequentie
                 const periode = 1 / frequentie;
 
@@ -182,7 +191,7 @@
         // Animation Loop Function
         function animate(currentTime) {
             // Calculate delta time in seconds for smooth animation
-            const deltaTime = (currentTime - lastTime) / 1000; 
+            const deltaTime = (currentTime - lastTime) / 1000;
             lastTime = currentTime;
 
             // Increase rotation angle by (angular_velocity * time_passed)
@@ -218,7 +227,7 @@
             ctx.arc(podX, podY, 25, 0, 2 * Math.PI);
             ctx.fillStyle = '#2563eb'; // primary blue
             ctx.fill();
-            
+
             // Loop the animation
             requestAnimationFrame(animate);
         }
@@ -232,4 +241,5 @@
         requestAnimationFrame(animate);
     </script>
 </body>
+
 </html>

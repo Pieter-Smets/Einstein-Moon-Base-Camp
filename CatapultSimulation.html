@@ -1,286 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Catapult Trajectory Simulation</title>
-    
+
 </head>
+
 <body>
 
-<div class="container">
-    <div class="nav-bar">
-        <a href="index.html" class="nav-back-btn">← Back to Dashboard</a>
-    </div>
-    <header>
-        <h1>Catapult Simulation</h1>
-...
-        <p>Set your parameters and launch the catapult to calculate the spreadsheet data.</p>
-    </header>
-
-    <div class="main-layout">
-        <div>
-            <div class="section-title">Parameters</div>
-            
-            <div class="input-group">
-                <label for="mass">Object Mass (kg)</label>
-                <input type="number" id="mass" value="100" step="0.1">
-            </div>
-
-            <div class="input-group">
-                <label for="velocity">Initial Velocity (m/s)</label>
-                <input type="number" id="velocity" value="30" step="0.1">
-            </div>
-
-            <div class="input-group">
-                <label for="gravity">Gravity (m/s²)</label>
-                <input type="number" id="gravity" value="-1.62" step="0.01">
-                <span style="font-size: 0.75rem; color: var(--text-muted);">Keep negative to match original formula math (e.g., -1.62).</span>
-            </div>
-
-            <div class="input-group">
-                <label for="angle">Launch Angle (°)</label>
-                <input type="number" id="angle" value="45" min="0" max="90" step="0.5">
-            </div>
-
-            <button class="launch-btn" id="launchBtn">Launch Catapult 🚀</button>
+    <div class="container">
+        <div class="nav-bar">
+            <a href="index.html" class="nav-back-btn">← Back to Dashboard</a>
         </div>
+        <header>
+            <h1>Catapult Simulation</h1>
+            ...
+            <p>Set your parameters and launch the catapult to calculate the spreadsheet data.</p>
+        </header>
 
-        <div>
-            <div class="output-card">
-                <div>
-                    <div class="section-title">Simulation Output</div>
-                    <div class="output-grid">
-                        <div class="output-box">
-                            <div class="label">Kinetic Energy</div>
-                            <div class="value" id="out-energy">-</div>
-                        </div>
-                        
-                        <div class="output-box">
-                            <div class="label">Discriminant</div>
-                            <div class="value" id="out-discriminant">-</div>
-                        </div>
+        <div class="main-layout">
+            <div>
+                <div class="section-title">Parameters</div>
 
-                        <div class="output-box">
-                            <div class="label">Flight Time</div>
-                            <div class="value" id="out-time">-</div>
-                        </div>
+                <div class="input-group">
+                    <label for="mass">Object Mass (kg)</label>
+                    <input type="number" id="mass" value="100" step="0.1">
+                </div>
 
-                        <div class="output-box">
-                            <div class="label">Total Distance</div>
-                            <div class="value" id="out-distance">-</div>
+                <div class="input-group">
+                    <label for="velocity">Initial Velocity (m/s)</label>
+                    <input type="number" id="velocity" value="30" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label for="gravity">Gravity (m/s²)</label>
+                    <input type="number" id="gravity" value="-1.62" step="0.01">
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Keep negative to match original formula
+                        math (e.g., -1.62).</span>
+                </div>
+
+                <div class="input-group">
+                    <label for="angle">Launch Angle (°)</label>
+                    <input type="number" id="angle" value="45" min="0" max="90" step="0.5">
+                </div>
+
+                <button class="launch-btn" id="launchBtn">Launch Catapult 🚀</button>
+            </div>
+
+            <div>
+                <div class="output-card">
+                    <div>
+                        <div class="section-title">Simulation Output</div>
+                        <div class="output-grid">
+                            <div class="output-box">
+                                <div class="label">Kinetic Energy</div>
+                                <div class="value" id="out-energy">-</div>
+                            </div>
+
+                            <div class="output-box">
+                                <div class="label">Discriminant</div>
+                                <div class="value" id="out-discriminant">-</div>
+                            </div>
+
+                            <div class="output-box">
+                                <div class="label">Flight Time</div>
+                                <div class="value" id="out-time">-</div>
+                            </div>
+
+                            <div class="output-box">
+                                <div class="label">Total Distance</div>
+                                <div class="value" id="out-distance">-</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="visualizer-container">
-            <div class="visualizer-title">Live Trajectory Path Visualization</div>
-            <canvas id="trajectoryCanvas"></canvas>
+            <div class="visualizer-container">
+                <div class="visualizer-title">Live Trajectory Path Visualization</div>
+                <canvas id="trajectoryCanvas"></canvas>
+            </div>
         </div>
+        <footer
+            style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+            <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a>
+            © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+            <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+                src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt=""
+                style="max-width: 1em;max-height:1em;margin-left: .2em;">
+        </footer>
     </div>
-    <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
-    <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a> 
-    © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under 
-    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
-    <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" 
-    style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;">
-</footer>
-</div>
 
-<script>
-    // Get HTML Elements
-    const inputMass = document.getElementById('mass');
-    const inputVelocity = document.getElementById('velocity');
-    const inputGravity = document.getElementById('gravity');
-    const inputAngle = document.getElementById('angle');
-    const launchBtn = document.getElementById('launchBtn');
+    <script>
+        // Get HTML Elements
+        const inputMass = document.getElementById('mass');
+        const inputVelocity = document.getElementById('velocity');
+        const inputGravity = document.getElementById('gravity');
+        const inputAngle = document.getElementById('angle');
+        const launchBtn = document.getElementById('launchBtn');
 
-    const outEnergy = document.getElementById('out-energy');
-    const outDiscriminant = document.getElementById('out-discriminant');
-    const outTime = document.getElementById('out-time');
-    const outDistance = document.getElementById('out-distance');
+        const outEnergy = document.getElementById('out-energy');
+        const outDiscriminant = document.getElementById('out-discriminant');
+        const outTime = document.getElementById('out-time');
+        const outDistance = document.getElementById('out-distance');
 
-    const canvas = document.getElementById('trajectoryCanvas');
-    const ctx = canvas.getContext('2d');
+        const canvas = document.getElementById('trajectoryCanvas');
+        const ctx = canvas.getContext('2d');
 
-    let animationFrameId = null;
+        let animationFrameId = null;
 
-    // Resize canvas to look crisp
-    function resizeCanvas() {
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * window.devicePixelRatio;
-        canvas.height = rect.height * window.devicePixelRatio;
-        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    }
-
-    function runSimulation() {
-        const mass = parseFloat(inputMass.value) || 0;
-        const velocity = parseFloat(inputVelocity.value) || 0;
-        const gravity = parseFloat(inputGravity.value) || 0;
-        const angleDeg = parseFloat(inputAngle.value) || 0;
-
-        const angleRad = angleDeg * Math.PI / 180;
-        const energy = 0.5 * mass * Math.pow(velocity, 2);
-        const discriminant = Math.pow(velocity * Math.sin(angleRad), 2);
-
-        let totalTime = 0;
-        let distance = 0;
-
-        if (gravity !== 0 && discriminant >= 0) {
-            totalTime = (-velocity * Math.sin(angleRad) - Math.sqrt(discriminant)) / gravity;
-            distance = velocity * Math.cos(angleRad) * totalTime;
+        // Resize canvas to look crisp
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
         }
 
-        // Dashboard formatting
-        outEnergy.innerText = isNaN(energy) ? "0 J" : `${Math.round(energy).toLocaleString()} J`;
-        outDiscriminant.innerText = isNaN(discriminant) ? "0" : discriminant.toFixed(2);
-        outTime.innerText = isNaN(totalTime) || totalTime < 0 ? "0.00 s" : `${totalTime.toFixed(2)} s`;
-        outDistance.innerText = isNaN(distance) || distance < 0 ? "0.00 m" : `${distance.toFixed(2)} m`;
+        function runSimulation() {
+            const mass = parseFloat(inputMass.value) || 0;
+            const velocity = parseFloat(inputVelocity.value) || 0;
+            const gravity = parseFloat(inputGravity.value) || 0;
+            const angleDeg = parseFloat(inputAngle.value) || 0;
 
-        startTrajectoryAnimation(velocity, angleRad, gravity, totalTime, distance);
-    }
+            const angleRad = angleDeg * Math.PI / 180;
+            const energy = 0.5 * mass * Math.pow(velocity, 2);
+            const discriminant = Math.pow(velocity * Math.sin(angleRad), 2);
 
-    function startTrajectoryAnimation(v0, theta, g, tEnd, maxDist) {
-        if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        
-        const startTime = performance.now();
-        const duration = 2000; // Slowed down slightly (2 seconds) to read the data
+            let totalTime = 0;
+            let distance = 0;
 
-        function renderLoop(now) {
-            const elapsed = now - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            drawTrajectory(v0, theta, g, tEnd, maxDist, progress);
-
-            if (progress < 1) {
-                animationFrameId = requestAnimationFrame(renderLoop);
+            if (gravity !== 0 && discriminant >= 0) {
+                totalTime = (-velocity * Math.sin(angleRad) - Math.sqrt(discriminant)) / gravity;
+                distance = velocity * Math.cos(angleRad) * totalTime;
             }
-        }
-        animationFrameId = requestAnimationFrame(renderLoop);
-    }
 
-    function drawTrajectory(v0, theta, g, tEnd, maxDist, progress) {
-        const w = canvas.width / window.devicePixelRatio;
-        const h = canvas.height / window.devicePixelRatio;
+            // Dashboard formatting
+            outEnergy.innerText = isNaN(energy) ? "0 J" : `${Math.round(energy).toLocaleString()} J`;
+            outDiscriminant.innerText = isNaN(discriminant) ? "0" : discriminant.toFixed(2);
+            outTime.innerText = isNaN(totalTime) || totalTime < 0 ? "0.00 s" : `${totalTime.toFixed(2)} s`;
+            outDistance.innerText = isNaN(distance) || distance < 0 ? "0.00 m" : `${distance.toFixed(2)} m`;
 
-        ctx.clearRect(0, 0, w, h);
-
-        if (tEnd <= 0 || maxDist <= 0 || isNaN(tEnd) || isNaN(maxDist)) return;
-
-        // Peak calculation
-        const tHalf = tEnd / 2;
-        const maxHeight = (v0 * Math.sin(theta) * tHalf) + (0.5 * g * Math.pow(tHalf, 2));
-
-        // Headroom buffer so the top doesn't clip vertically
-        const graphMaxY = maxHeight * 1.2; 
-
-        // FIX: Increased from 50 to 75 to give text labels on the left plenty of room
-        const padding = 75; 
-        const renderWidth = w - (padding * 2);
-        const renderHeight = h - (padding * 2);
-
-        function mapX(xVal) { return padding + (xVal / maxDist) * renderWidth; }
-        function mapY(yVal) { 
-            if (graphMaxY <= 0) return h - padding;
-            return (h - padding) - (yVal / graphMaxY) * renderHeight; 
+            startTrajectoryAnimation(velocity, angleRad, gravity, totalTime, distance);
         }
 
-        // ================= DRAW AXES =================
-        ctx.strokeStyle = '#475569';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        
-        // Y-axis
-        ctx.moveTo(padding, h - padding + 10);
-        ctx.lineTo(padding, padding - 20);
-        
-        // X-axis
-        ctx.moveTo(padding - 10, h - padding);
-        ctx.lineTo(w - padding + 20, h - padding);
-        ctx.stroke();
+        function startTrajectoryAnimation(v0, theta, g, tEnd, maxDist) {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
-        // X-axis label (Max Distance)
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`Max Dist: ${maxDist.toFixed(1)}m`, mapX(maxDist), h - padding + 20);
-        
-        // Y-axis label (Max Height)
-        ctx.textAlign = 'right';
-        ctx.fillText(`${maxHeight.toFixed(1)}m (Apex)`, padding+20 - 10, mapY(maxHeight) + 4);
+            const startTime = performance.now();
+            const duration = 2000; // Slowed down slightly (2 seconds) to read the data
 
-        // Dotted line marking the Apex (highest point)
-        ctx.beginPath();
-        ctx.setLineDash([4, 4]);
-        ctx.strokeStyle = '#64748b';
-        ctx.moveTo(padding, mapY(maxHeight));
-        ctx.lineTo(mapX(maxDist / 2), mapY(maxHeight));
-        ctx.lineTo(mapX(maxDist / 2), h - padding);
-        ctx.stroke();
-        ctx.setLineDash([]); // Reset dash
+            function renderLoop(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
 
-        // ================= TRACE FLIGHT PATH =================
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
+                drawTrajectory(v0, theta, g, tEnd, maxDist, progress);
 
-        const totalSteps = 100;
-        const currentSteps = Math.floor(totalSteps * progress);
-
-        for (let i = 0; i <= currentSteps; i++) {
-            const t = (i / totalSteps) * tEnd;
-            const x = v0 * Math.cos(theta) * t;
-            const y = (v0 * Math.sin(theta) * t) + (0.5 * g * Math.pow(t, 2));
-
-            if (i === 0) ctx.moveTo(mapX(x), mapY(y));
-            else ctx.lineTo(mapX(x), mapY(y));
+                if (progress < 1) {
+                    animationFrameId = requestAnimationFrame(renderLoop);
+                }
+            }
+            animationFrameId = requestAnimationFrame(renderLoop);
         }
-        ctx.stroke();
 
-        // Current real-time physics data
-        const currentT = tEnd * progress;
-        const currentX = v0 * Math.cos(theta) * currentT;
-        const currentY = (v0 * Math.sin(theta) * currentT) + (0.5 * g * Math.pow(currentT, 2));
-        
-        // Calculating Current Velocity Vector Magnitude
-        const vx = v0 * Math.cos(theta);
-        const vy = (v0 * Math.sin(theta)) + (g * currentT);
-        const currentSpeed = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
+        function drawTrajectory(v0, theta, g, tEnd, maxDist, progress) {
+            const w = canvas.width / window.devicePixelRatio;
+            const h = canvas.height / window.devicePixelRatio;
 
-        // Draw active projectile dot
-        ctx.fillStyle = '#ef4444';
-        ctx.beginPath();
-        ctx.arc(mapX(currentX), mapY(currentY), 6, 0, 2 * Math.PI);
-        ctx.fill();
+            ctx.clearRect(0, 0, w, h);
 
-        // ================= DRAW LIVE HUD =================
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
-        ctx.fillRect(w - 180, 10, 160, 90);
-        ctx.strokeStyle = '#334155';
-        ctx.strokeRect(w - 180, 10, 160, 90);
+            if (tEnd <= 0 || maxDist <= 0 || isNaN(tEnd) || isNaN(maxDist)) return;
 
-        ctx.fillStyle = '#f8fafc';
-        ctx.textAlign = 'left';
-        ctx.font = '12px monospace';
-        
-        ctx.fillText(`Time  : ${currentT.toFixed(2)} s`, w - 170, 30);
-        ctx.fillText(`Dist  : ${currentX.toFixed(2)} m`, w - 170, 50);
-        ctx.fillText(`Height: ${Math.max(0, currentY).toFixed(2)} m`, w - 170, 70);
-        ctx.fillText(`Speed : ${currentSpeed.toFixed(2)} m/s`, w - 170, 90);
-    }
+            // Peak calculation
+            const tHalf = tEnd / 2;
+            const maxHeight = (v0 * Math.sin(theta) * tHalf) + (0.5 * g * Math.pow(tHalf, 2));
 
-    launchBtn.addEventListener('click', runSimulation);
+            // Headroom buffer so the top doesn't clip vertically
+            const graphMaxY = maxHeight * 1.2;
 
-    window.addEventListener('resize', () => {
+            // FIX: Increased from 50 to 75 to give text labels on the left plenty of room
+            const padding = 75;
+            const renderWidth = w - (padding * 2);
+            const renderHeight = h - (padding * 2);
+
+            function mapX(xVal) { return padding + (xVal / maxDist) * renderWidth; }
+            function mapY(yVal) {
+                if (graphMaxY <= 0) return h - padding;
+                return (h - padding) - (yVal / graphMaxY) * renderHeight;
+            }
+
+            // ================= DRAW AXES =================
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+
+            // Y-axis
+            ctx.moveTo(padding, h - padding + 10);
+            ctx.lineTo(padding, padding - 20);
+
+            // X-axis
+            ctx.moveTo(padding - 10, h - padding);
+            ctx.lineTo(w - padding + 20, h - padding);
+            ctx.stroke();
+
+            // X-axis label (Max Distance)
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Max Dist: ${maxDist.toFixed(1)}m`, mapX(maxDist), h - padding + 20);
+
+            // Y-axis label (Max Height)
+            ctx.textAlign = 'right';
+            ctx.fillText(`${maxHeight.toFixed(1)}m (Apex)`, padding + 20 - 10, mapY(maxHeight) + 4);
+
+            // Dotted line marking the Apex (highest point)
+            ctx.beginPath();
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = '#64748b';
+            ctx.moveTo(padding, mapY(maxHeight));
+            ctx.lineTo(mapX(maxDist / 2), mapY(maxHeight));
+            ctx.lineTo(mapX(maxDist / 2), h - padding);
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset dash
+
+            // ================= TRACE FLIGHT PATH =================
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            const totalSteps = 100;
+            const currentSteps = Math.floor(totalSteps * progress);
+
+            for (let i = 0; i <= currentSteps; i++) {
+                const t = (i / totalSteps) * tEnd;
+                const x = v0 * Math.cos(theta) * t;
+                const y = (v0 * Math.sin(theta) * t) + (0.5 * g * Math.pow(t, 2));
+
+                if (i === 0) ctx.moveTo(mapX(x), mapY(y));
+                else ctx.lineTo(mapX(x), mapY(y));
+            }
+            ctx.stroke();
+
+            // Current real-time physics data
+            const currentT = tEnd * progress;
+            const currentX = v0 * Math.cos(theta) * currentT;
+            const currentY = (v0 * Math.sin(theta) * currentT) + (0.5 * g * Math.pow(currentT, 2));
+
+            // Calculating Current Velocity Vector Magnitude
+            const vx = v0 * Math.cos(theta);
+            const vy = (v0 * Math.sin(theta)) + (g * currentT);
+            const currentSpeed = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
+
+            // Draw active projectile dot
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.arc(mapX(currentX), mapY(currentY), 6, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // ================= DRAW LIVE HUD =================
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+            ctx.fillRect(w - 180, 10, 160, 90);
+            ctx.strokeStyle = '#334155';
+            ctx.strokeRect(w - 180, 10, 160, 90);
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.textAlign = 'left';
+            ctx.font = '12px monospace';
+
+            ctx.fillText(`Time  : ${currentT.toFixed(2)} s`, w - 170, 30);
+            ctx.fillText(`Dist  : ${currentX.toFixed(2)} m`, w - 170, 50);
+            ctx.fillText(`Height: ${Math.max(0, currentY).toFixed(2)} m`, w - 170, 70);
+            ctx.fillText(`Speed : ${currentSpeed.toFixed(2)} m/s`, w - 170, 90);
+        }
+
+        launchBtn.addEventListener('click', runSimulation);
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
         resizeCanvas();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    });
-
-    resizeCanvas();
-</script>
+    </script>
 
 </body>
+
 </html>
