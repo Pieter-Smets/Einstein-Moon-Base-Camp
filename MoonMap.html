@@ -19,13 +19,13 @@
         #map { 
             height: 100%; 
             width: 100%; 
-            background-color: #0b0c10; /* Clean placeholder dark match while tiles load */
+            background-color: #1e293b; /* Fallback palette color matching style.css */
             border: 2px solid var(--border);
             border-radius: 12px;
-            box-shadow: 0px 10px 25px rgba(0,0,0,0.5);
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.05);
         }
         
-        /* Coordinate inputs grouping dashboard container styling */
+        /* Coordinates inputs grouping dashboard container styling */
         .coordinate-bar {
             display: flex;
             gap: 1rem;
@@ -76,6 +76,18 @@
         .go-btn:active {
             transform: scale(0.98);
         }
+
+        /* Menu Overlay Theme Overrides to completely fit style.css elements */
+        .leaflet-control-layers {
+            background: var(--card-bg) !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 8px !important;
+            padding: 8px 12px !important;
+            font-family: inherit !important;
+            font-size: 0.85rem !important;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.08) !important;
+        }
     </style>
 </head>
 <body>
@@ -86,8 +98,8 @@
         </div>
         
         <header style="margin-top: 1rem;">
-            <h1 style="color: var(--primary); font-size: 2.25rem; margin-bottom: 0.5rem;">Lunar Elevation Map</h1>
-            <p style="color: var(--text-muted);">Explore topographic variations using NASA LRO/LOLA data structures.</p>
+            <h1 style="color: var(--primary); font-size: 2.25rem; margin-bottom: 0.5rem;">Lunar Observation Map</h1>
+            <p style="color: var(--text-muted);">Explore topological elevation and mapping matrices via raw NASA data streams.</p>
         </header>
         
         <div class="coordinate-bar">
@@ -112,18 +124,54 @@
         var map = L.map('map', {
             crs: L.CRS.EPSG4326,
             minZoom: 1,
-            maxZoom: 8
+            maxZoom: 8,
+            zoomControl: true
         }).setView([0, 0], 2);
 
-        // 2. Render target USGS NASA Lunar WMS Tile sets (CORRECT STRINGS INTEGRATED)
-        L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
+        // 2. Define our 4 distinct USGS NASA Lunar WMS Layers
+        var layerColorElevation = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
             layers: 'LOLA_color',
             format: 'image/png',
             transparent: false,
-            attribution: 'USGS Planetary Mapping / NASA LRO'
-        }).addTo(map);
+            attribution: 'USGS / NASA LRO'
+        });
 
-        // SAFEGUARD: Force Leaflet to recalculate visual sizes right after DOM settles
+        var layerShadedRelief = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
+            layers: 'LOLA_bw',
+            format: 'image/png',
+            transparent: false,
+            attribution: 'USGS / NASA LRO'
+        });
+
+        var layerSteelElevation = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
+            layers: 'LOLA_steel',
+            format: 'image/png',
+            transparent: false,
+            attribution: 'USGS / NASA LRO'
+        });
+
+        var layerPhotography = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
+            layers: 'LROC_WAC',
+            format: 'image/png',
+            transparent: false,
+            attribution: 'ASU / NASA LRO'
+        });
+
+        // Add the primary default view straight onto the active viewport grid
+        layerColorElevation.addTo(map);
+
+        // 3. Construct the Registry Object for base map selections
+        var baseLunarLayers = {
+            "LOLA Color Elevation": layerColorElevation,
+            "LOLA Shaded Relief": layerShadedRelief,
+            "LOLA Steel Altimeter": layerSteelElevation,
+            "LROC Photographic Mosaic": layerPhotography
+        };
+
+        // Inject the selector panel onto our initialized canvas structure
+        L.control.layers(baseLunarLayers, null, { position: 'topright', collapsed: false }).addTo(map);
+
+        // SAFEGUARD: Recalculate dimensions cleanly once the window settles
         setTimeout(function() {
             map.invalidateSize();
         }, 150);
@@ -131,7 +179,7 @@
         // Keep variable track of our active coordinate marker pin
         let searchMarker = null;
 
-        // 3. Coordinate navigation logic handler
+        // 4. Coordinate navigation logic handler
         document.getElementById('btn-go').addEventListener('click', function() {
             const latInput = document.getElementById('input-lat').value;
             const lngInput = document.getElementById('input-lng').value;
@@ -153,10 +201,9 @@
                 return;
             }
 
-            // Recalculate size bounds before shifting the viewfinder frame
             map.invalidateSize();
 
-            // Snap view to targeted locations smoothly
+            // Shift current viewport frame
             const targetedZoom = map.getZoom() < 5 ? 5 : map.getZoom();
             map.setView([lat, lng], targetedZoom);
 
@@ -166,8 +213,8 @@
             } else {
                 searchMarker = L.circleMarker([lat, lng], {
                     radius: 12,            
-                    color: '#2563eb',      // Matches theme dashboard primary accent colors
-                    fillColor: '#2563eb',  
+                    color: 'var(--primary)', // Hooks smoothly into your style.css theme colors
+                    fillColor: 'var(--primary)',  
                     fillOpacity: 0.3,      
                     weight: 2             
                 }).addTo(map);
@@ -176,7 +223,7 @@
             // Spawn information tooltip display box
             searchMarker.bindPopup(`
                 <div style="color: #1e293b; font-family: sans-serif; font-size: 0.9rem; line-height: 1.4;">
-                    <strong style="color: #2563eb;">Target Coordinates Locked</strong><br>
+                    <strong style="color: var(--primary);">Target Coordinates Locked</strong><br>
                     <span style="color: #64748b;">Latitude:</span> <strong>${lat.toFixed(4)}°</strong><br>
                     <span style="color: #64748b;">Longitude:</span> <strong>${lng.toFixed(4)}°</strong>
                 </div>
