@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centrifuge Simulator</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Extra layout styling to fit the components cleanly */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .inputs-section h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .outputs-section h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        canvas {
+            width: 100%;
+            max-width: 350px;
+            height: 350px;
+            background-color: transparent;
+            display: block;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+    <div class="nav-bar">
+        <a href="index.html" class="nav-back-btn">← Terug naar Dashboard</a>
+    </div>
+    <h1 style="text-align: center; color: var(--text-main);">Centrifuge Simulator</h1>
+        
+        <div class="grid-layout">
+            <div class="data-column">
+                <div class="inputs-section">
+                    <h3>Input</h3>
+                    <div class="input-group">
+                        <label for="length">Lengte arm (m)</label>
+                        <input type="number" id="length" value="10" step="0.1" min="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label for="gravity">Target zwaartekracht (m/s²)</label>
+                        <input type="number" id="gravity" value="9.81" step="0.01" min="0.01">
+                    </div>
+                </div>
+
+                <div class="outputs-section" style="margin-top: 2rem;">
+                    <h3>Output</h3>
+                    <div class="output-grid">
+                        <div class="output-box">
+                            <div class="label">Snelheid (m/s)</div>
+                            <div class="value" id="snelheid">0.00</div>
+                        </div>
+                        <div class="output-box">
+                            <div class="label">Hoeksnelheid (rad/s)</div>
+                            <div class="value" id="hoeksnelheid">0.00</div>
+                        </div>
+                        <div class="output-box">
+                            <div class="label">Frequentie (Hz)</div>
+                            <div class="value" id="frequentie">0.00</div>
+                        </div>
+                        <div class="output-box">
+                            <div class="label">Periode (s)</div>
+                            <div class="value" id="periode">0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualizer-container">
+                <h3 class="visualizer-title">Live Animatie</h3>
+                <canvas id="centrifugeCanvas" width="350" height="350"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const lengthInput = document.getElementById('length');
+        const gravityInput = document.getElementById('gravity');
+
+        const snelheidEl = document.getElementById('snelheid');
+        const hoeksnelheidEl = document.getElementById('hoeksnelheid');
+        const frequentieEl = document.getElementById('frequentie');
+        const periodeEl = document.getElementById('periode');
+
+        const canvas = document.getElementById('centrifugeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Animation Variables
+        let currentAngle = 0;
+        let angularVelocity = 0; // rad/s
+        let lastTime = performance.now();
+
+        // Formula Calculation Function
+        function updateCalculations() {
+            const length = parseFloat(lengthInput.value) || 0;
+            const gravity = parseFloat(gravityInput.value) || 0;
+
+            if (length > 0 && gravity > 0) {
+                // Spreadsheet formulas:
+                // Snelheid = WORTEL(B3*B2) -> sqrt(gravity * length)
+                const snelheid = Math.sqrt(gravity * length);
+                
+                // Hoeksnelheid = B6/B2 -> snelheid / length
+                const hoeksnelheid = snelheid / length;
+                
+                // Frequentie = B7/(2*PI()) -> hoeksnelheid / (2 * PI)
+                const frequentie = hoeksnelheid / (2 * Math.PI);
+                
+                // Periode = 1/B8 -> 1 / frequentie
+                const periode = 1 / frequentie;
+
+                // Update UI elements (to 2 decimal places)
+                snelheidEl.textContent = snelheid.toFixed(2);
+                hoeksnelheidEl.textContent = hoeksnelheid.toFixed(2);
+                frequentieEl.textContent = frequentie.toFixed(2);
+                periodeEl.textContent = periode.toFixed(2);
+
+                // Update animation speed
+                angularVelocity = hoeksnelheid;
+            } else {
+                // Reset to zeros if invalid
+                snelheidEl.textContent = "0.00";
+                hoeksnelheidEl.textContent = "0.00";
+                frequentieEl.textContent = "0.00";
+                periodeEl.textContent = "0.00";
+                angularVelocity = 0;
+            }
+        }
+
+        // Animation Loop Function
+        function animate(currentTime) {
+            // Calculate delta time in seconds for smooth animation
+            const deltaTime = (currentTime - lastTime) / 1000; 
+            lastTime = currentTime;
+
+            // Increase rotation angle by (angular_velocity * time_passed)
+            currentAngle += angularVelocity * deltaTime;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 30; // Max visual radius
+
+            // 1. Draw central hub
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI);
+            ctx.fillStyle = '#64748b'; // muted gray
+            ctx.fill();
+
+            // 2. Calculate pod position
+            const podX = centerX + radius * Math.cos(currentAngle);
+            const podY = centerY + radius * Math.sin(currentAngle);
+
+            // 3. Draw centrifuge arm
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(podX, podY);
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 6;
+            ctx.stroke();
+
+            // 4. Draw centrifuge pod
+            ctx.beginPath();
+            ctx.arc(podX, podY, 25, 0, 2 * Math.PI);
+            ctx.fillStyle = '#2563eb'; // primary blue
+            ctx.fill();
+            
+            // Loop the animation
+            requestAnimationFrame(animate);
+        }
+
+        // Event listeners for user input
+        lengthInput.addEventListener('input', updateCalculations);
+        gravityInput.addEventListener('input', updateCalculations);
+
+        // Initialize math and animation loop
+        updateCalculations();
+        requestAnimationFrame(animate);
+    </script>
+</body>
+</html>
