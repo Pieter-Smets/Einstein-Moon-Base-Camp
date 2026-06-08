@@ -1,14 +1,22 @@
 :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --success: #16a34a;
-            --success-hover: #15803d;
-            --background: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-        }
+    /* Core Dashboard Colors */
+    --background: #0b0c10;    /* Deep space black (matches your Moon Map perfectly) */
+    --card-bg: #1f2833;       /* Dark slate for cards, panels, and containers */
+    
+    /* Typography */
+    --text-main: #f8fafc;     /* Bright crisp white for high readability */
+    --text-muted: #94a3b8;    /* Soft gray for secondary text and descriptions */
+    
+    /* Accents & UI Elements */
+    --primary: #38bdf8;       /* Neon telemetry blue for links and highlights */
+    --primary-hover: #0284c7; /* Darker blue for button hover states */
+    --success: #10b981;       /* Emerald green for positive output values */
+    --success-hover: #059669; /* Darker green */
+    --border: #334155;        /* Subtle dark borders to separate content cleanly */
+}
+
+/* Fix input fields for Dark Mode */
+
 
         * {
             box-sizing: border-box;
@@ -211,4 +219,27 @@
 
 .nav-back-btn:hover {
     color: var(--primary);
+}
+
+/* --- Fix for Input Fields (Dark Mode) --- */
+.input-group input,
+input[type="number"], 
+input[type="text"] {
+    background-color: #0f172a !important; /* Dark background */
+    color: #f8fafc !important;            /* White text */
+    border: 1px solid #334155 !important; /* Subtle dark border */
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    width: 100%;
+}
+
+/* Glowing effect when clicking on the input box */
+.input-group input:focus,
+input[type="number"]:focus, 
+input[type="text"]:focus {
+    outline: none;
+    border-color: #38bdf8 !important;     /* Neon blue border */
+    background-color: #1e293b !important; /* Slightly lighter background when active */
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15) !important;
 }

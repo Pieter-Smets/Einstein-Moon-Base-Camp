@@ -1,0 +1,17 @@
+{
+  "short_name": "SpaceSuite",
+  "name": "Space Simulation Suite",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1043/1043431.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#0b0c10",
+  "theme_color": "#0b0c10",
+  "display": "standalone",
+  "orientation": "portrait"
+}
