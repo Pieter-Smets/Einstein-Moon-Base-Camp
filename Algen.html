@@ -48,28 +48,28 @@
 
             <div class="output-card">
                 <div>
-                    <h2 class="section-title" style="color: var(--text-main); margin-bottom: 1.5rem;">Simulatie
+                    <h2 class="section-title">Simulatie
                         Resultaten</h2>
                     <div class="output-grid">
                         <div class="output-box">
                             <div class="label">Zuurstofnood / dag</div>
                             <div class="value"><span id="outZuurstofnood">0.00</span> <span
-                                    style="font-size: 0.8rem; color: var(--text-muted);">kg</span></div>
+                                    class="small-muted">kg</span></div>
                         </div>
                         <div class="output-box">
                             <div class="label">Massa algen</div>
                             <div class="value"><span id="outMassaAlgen">0.00</span> <span
-                                    style="font-size: 0.8rem; color: var(--text-muted);">kg</span></div>
+                                    class="small-muted">kg</span></div>
                         </div>
-                        <div class="output-box" style="grid-column: span 2; margin-top: 0.5rem;">
+                        <div class="output-box span-2">
                             <div class="label">Benodigd volume water</div>
                             <div class="value"><span id="outVolumeWater">0.00</span> <span
-                                    style="font-size: 0.9rem; color: var(--text-muted);">Liter</span></div>
+                                    class="small-muted">Liter</span></div>
                         </div>
                     </div>
                 </div>
 
-                <div style="margin-top: 2rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+                <div class="note">
                     <strong>Systeeminformatie:</strong> De bioreactor past zich automatisch aan op basis van de
                     ingevoerde parameters om een stabiel levensbehoud te garanderen.
                 </div>
@@ -80,19 +80,14 @@
                 <canvas id="bioreactorCanvas" width="800" height="350"></canvas>
             </div>
         </div>
-        <footer
-            style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+        <footer class="site-footer">
             <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a>
             © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under
             <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
-            <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt=""
-                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
-                src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt=""
-                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
-                src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt=""
-                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
-                src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt=""
-                style="max-width: 1em;max-height:1em;margin-left: .2em;">
+            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="">
+            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="">
+            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="">
+            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt="">
         </footer>
     </div>
 

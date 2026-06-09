@@ -8,98 +8,18 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="style.css">
     
-    <style>
-        #map-container {
-            display: block; 
-            height: 55vh; 
-            width: 100%;
-            position: relative;
-            margin-top: 1rem;
-        }
-        #map { 
-            height: 100%; 
-            width: 100%; 
-            background-color: #1e293b; /* Fallback palette color matching style.css */
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            box-shadow: 0px 10px 25px rgba(0,0,0,0.05);
-        }
-        
-        /* Coordinates inputs grouping dashboard container styling */
-        .coordinate-bar {
-            display: flex;
-            gap: 1rem;
-            margin: 1.5rem 0;
-            align-items: flex-end;
-            flex-wrap: wrap;
-            background: var(--card-bg);
-            padding: 1.25rem;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-        }
-        .coord-input-group {
-            flex: 1;
-            min-width: 140px;
-        }
-        .coord-input-group label {
-            display: block;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-bottom: 0.4rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-        }
-        .coord-input-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--background);
-            color: var(--text-main);
-            font-size: 1rem;
-        }
-        .go-btn {
-            padding: 0.75rem 1.5rem;
-            background-color: var(--primary);
-            color: #ffffff;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            height: 45px;
-            transition: background-color 0.2s, transform 0.1s;
-        }
-        .go-btn:hover {
-            background-color: var(--primary-hover);
-        }
-        .go-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Menu Overlay Theme Overrides to completely fit style.css elements */
-        .leaflet-control-layers {
-            background: var(--card-bg) !important;
-            color: var(--text-main) !important;
-            border: 1px solid var(--border) !important;
-            border-radius: 8px !important;
-            padding: 8px 12px !important;
-            font-family: inherit !important;
-            font-size: 0.85rem !important;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.08) !important;
-        }
-    </style>
+    
 </head>
 <body>
 
-    <div class="container" style="margin: 2rem auto; max-width: 1100px; height: auto;">
+    <div class="container page-wrapper moonmap">
         <div class="nav-bar">
-            <a href="index.html" class="nav-back-btn" style="text-decoration: none; color: var(--primary); font-weight: bold;">← Back to Dashboard</a>
+            <a href="index.html" class="nav-back-btn">← Back to Dashboard</a>
         </div>
         
-        <header style="margin-top: 1rem;">
-            <h1 style="color: var(--primary); font-size: 2.25rem; margin-bottom: 0.5rem;">Lunar Observation Map</h1>
-            <p style="color: var(--text-muted);">Explore topological elevation and mapping matrices via raw NASA data streams.</p>
+    <header class="page-header">
+            <h1 class="page-title">Lunar Observation Map</h1>
+            <p>Explore topological elevation and mapping matrices via raw NASA data streams.</p>
         </header>
         
         <div class="coordinate-bar">
@@ -222,10 +142,10 @@
 
             // Spawn information tooltip display box
             searchMarker.bindPopup(`
-                <div style="color: #1e293b; font-family: sans-serif; font-size: 0.9rem; line-height: 1.4;">
-                    <strong style="color: var(--primary);">Target Coordinates Locked</strong><br>
-                    <span style="color: #64748b;">Latitude:</span> <strong>${lat.toFixed(4)}°</strong><br>
-                    <span style="color: #64748b;">Longitude:</span> <strong>${lng.toFixed(4)}°</strong>
+                <div class="popup-info">
+                    <strong class="popup-title">Target Coordinates Locked</strong><br>
+                    <span class="popup-meta">Latitude:</span> <strong>${lat.toFixed(4)}°</strong><br>
+                    <span class="popup-meta">Longitude:</span> <strong>${lng.toFixed(4)}°</strong>
                 </div>
             `).openPopup();
         });

@@ -6,74 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Centrifuge Simulator</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Extra layout styling to fit the components cleanly */
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 1.5rem;
-        }
-
-        .inputs-section h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .outputs-section h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        canvas {
-            width: 100%;
-            max-width: 350px;
-            height: 350px;
-            background-color: transparent;
-            display: block;
-            margin: 0 auto;
-        }
-
-        @media (max-width: 768px) {
-            .grid-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    
 </head>
 
-<body>
+<body class="centrifuge">
 
     <div class="container">
         <div class="nav-bar">
             <a href="index.html" class="nav-back-btn">← Terug naar Dashboard</a>
         </div>
-        <h1 style="text-align: center; color: var(--text-main);">Centrifuge Simulator</h1>
+    <h1 class="page-title">Centrifuge Simulator</h1>
 
         <div class="grid-layout">
             <div class="data-column">
@@ -89,7 +31,7 @@
                     </div>
                 </div>
 
-                <div class="outputs-section" style="margin-top: 2rem;">
+                <div class="outputs-section">
                     <h3>Output</h3>
                     <div class="output-grid">
                         <div class="output-box">
@@ -117,19 +59,14 @@
                 <canvas id="centrifugeCanvas" width="350" height="350"></canvas>
             </div>
         </div>
-        <footer
-            style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+        <footer class="site-footer">
             <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a>
             © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under
             <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
-            <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt=""
-                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
-                src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt=""
-                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
-                src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt=""
-                style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
-                src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt=""
-                style="max-width: 1em;max-height:1em;margin-left: .2em;">
+            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="">
+            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="">
+            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="">
+            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt="">
         </footer>
     </div>
 
