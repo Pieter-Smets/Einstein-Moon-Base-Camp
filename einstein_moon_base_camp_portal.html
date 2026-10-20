@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einstein Moon Base Camp - Engineering Design Presentation</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        sans: ['"Space Grotesk"', 'sans-serif'],
+                    },
+                    colors: {
+                        nasa: {
+                            dark: '#080d14',
+                            card: '#0e1726',
+                            border: '#1e2d42',
+                            blue: '#0066cc',
+                            cyan: '#00d2ff',
+                            emerald: '#00e676',
+                            amber: '#ffb300',
+                            purple: '#b388ff',
+                            red: '#ff5252'
+                        }
+                    },
+                    boxShadow: {
+                        'tech-glow': '0 0 20px rgba(0, 210, 255, 0.25)',
+                        'green-glow': '0 0 20px rgba(0, 230, 118, 0.25)',
+                        'amber-glow': '0 0 20px rgba(255, 179, 0, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Precision Blueprint Grid */
+        .bg-grid-pattern {
+            background-size: 30px 30px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 210, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 210, 255, 0.05) 1px, transparent 1px);
+        }
+        
+        /* Map Hotspot glow animations */
+        .map-hotspot {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .map-hotspot:hover .hotspot-shape {
+            stroke: #00d2ff;
+            stroke-width: 3.5px;
+            filter: drop-shadow(0px 0px 8px rgba(0, 210, 255, 0.8));
+        }
+        .map-hotspot.active .hotspot-shape {
+            stroke: #00e676 !important;
+            stroke-width: 4px;
+            filter: drop-shadow(0px 0px 12px rgba(0, 230, 118, 0.9));
+        }
+        .map-hotspot.dimmed {
+            opacity: 0.25;
+            filter: grayscale(80%);
+        }
+
+        /* Pulse radar ping */
+        @keyframes radar-ping {
+            0% { transform: scale(0.8); opacity: 0.9; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+        .ping-ring {
+            transform-origin: center;
+            animation: radar-ping 2.5s infinite linear;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(8, 13, 20, 0.9); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 210, 255, 0.6); }
+
+        /* Scanning grid line */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(1000%); }
+        }
+        .animate-scanline {
+            animation: scanline 10s linear infinite;
+        }
+    </style>
+</head>
+<body class="h-full w-full overflow-hidden bg-nasa-dark font-sans text-slate-100 flex flex-col select-none">
+
+    <!-- TOP HEADER / ACADEMIC MISSION CONTROL BAR -->
+    <header class="relative z-30 flex flex-wrap items-center justify-between border-b border-nasa-border bg-nasa-dark/95 px-4 py-2.5 backdrop-blur-md">
+        <!-- Project Title & Subtitle -->
+        <div class="flex items-center space-x-3.5">
+            <div class="relative flex h-10 w-10 items-center justify-center rounded-lg border border-cyan-500/50 bg-cyan-950/40 text-nasa-cyan shadow-tech-glow">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.6 15.12a2 2 0 00-1.182.118l-1.01.404a1 1 0 00-.608.928V19a1 1 0 001 1h16a1 1 0 001-1v-2.05a1 1 0 00-.372-.782l-.602-.482zM12 3a4 4 0 100 8 4 4 0 000-8z" />
+                </svg>
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <h1 class="font-mono text-base font-bold tracking-wide text-white">EINSTEIN MOON BASE CAMP</h1>
+                    <span class="inline-flex items-center rounded-md bg-cyan-500/10 px-2 py-0.5 text-xs font-mono font-medium text-nasa-cyan border border-cyan-500/30">
+                        EVALUATION PORTAL
+                    </span>
+                </div>
+                <p class="font-mono text-xs text-slate-400">STUDENT ENGINEERING DESIGN PROJECT // JURY PRESENTATION & SIMULATION SUITE</p>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative min-w-[260px] max-w-sm flex-1 mx-3 my-1 sm:my-0">
+            <div class="relative flex items-center">
+                <svg class="absolute left-3 h-4 w-4 text-nasa-cyan/70 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" id="searchInput" placeholder="Search systems (e.g. ECLSS, Regolith, ISRU, Radiation)..." 
+                    class="w-full rounded-md border border-slate-700 bg-slate-900/90 py-1.5 pl-9 pr-8 text-xs font-mono text-cyan-200 placeholder-slate-500 focus:border-nasa-cyan focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-nasa-cyan transition-all">
+                <button id="clearSearchBtn" class="hidden absolute right-2.5 text-slate-400 hover:text-white text-xs">✕</button>
+            </div>
+            <!-- Search Dropdown -->
+            <div id="searchDropdown" class="hidden absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-md border border-nasa-border bg-nasa-card/98 shadow-2xl backdrop-blur-lg z-50 py-1 text-xs font-mono"></div>
+        </div>
+
+        <!-- Global Presentation Actions & Simulation Launch Button -->
+        <div class="flex items-center space-x-2">
+            <!-- Jury Tour Trigger Button -->
+            <button id="startJuryTourBtn" class="flex items-center space-x-2 rounded-md border border-emerald-500/60 bg-emerald-950/40 px-3 py-1.5 font-mono text-xs font-bold text-nasa-emerald hover:bg-emerald-900/50 hover:border-emerald-400 transition shadow-green-glow">
+                <span class="animate-pulse">🎬</span>
+                <span>JURY GUIDED TOUR</span>
+            </button>
+
+            <!-- Global Live Simulation Button -->
+            <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/" target="_blank" rel="noopener" class="flex items-center space-x-2 rounded-md border border-nasa-cyan bg-cyan-950/50 px-3 py-1.5 font-mono text-xs font-bold text-nasa-cyan hover:bg-nasa-cyan hover:text-slate-950 transition shadow-tech-glow">
+                <span>LAUNCH LIVE SIMULATION SUITE</span>
+                <span class="text-sm">↗</span>
+            </a>
+
+            <!-- Mapper Dev Tool -->
+            <button id="openDevToolBtn" title="Map & Coordinate Calibration Tool" class="flex items-center rounded-md border border-slate-700 bg-slate-900 p-1.5 text-xs font-mono text-slate-300 hover:border-cyan-400 hover:text-nasa-cyan transition">
+                ⚙️
+            </button>
+
+            <!-- Directory Toggle -->
+            <button id="toggleSidebarBtn" title="Toggle Sector List" class="flex items-center rounded-md border border-slate-700 bg-slate-900 p-1.5 text-xs font-mono text-slate-300 hover:border-cyan-400 hover:text-nasa-cyan transition">
+                📋
+            </button>
+        </div>
+    </header>
+
+    <!-- ENVIRONMENTAL CONSTRAINT FILTER BAR -->
+    <div class="relative z-20 flex items-center justify-between border-b border-nasa-border bg-slate-900/90 px-4 py-2 text-xs font-mono backdrop-blur-md overflow-x-auto">
+        <div class="flex items-center space-x-2 min-w-max">
+            <span class="text-slate-400 font-bold uppercase tracking-wider text-[11px] mr-1">ENVIRONMENTAL CONSTRAINT LENSES:</span>
+            
+            <button data-constraint="all" class="constraint-btn active rounded-md border border-cyan-500 bg-cyan-950/60 px-2.5 py-1 text-white hover:border-cyan-400 transition">
+                🌐 All Systems
+            </button>
+            <button data-constraint="radiation" class="constraint-btn rounded-md border border-slate-700 bg-slate-950 px-2.5 py-1 text-slate-300 hover:border-cyan-400 transition">
+                🛡️ Radiation & SPE Defense
+            </button>
+            <button data-constraint="power" class="constraint-btn rounded-md border border-slate-700 bg-slate-950 px-2.5 py-1 text-slate-300 hover:border-cyan-400 transition">
+                ⚡ 14-Day Night Power
+            </button>
+            <button data-constraint="isru" class="constraint-btn rounded-md border border-slate-700 bg-slate-950 px-2.5 py-1 text-slate-300 hover:border-cyan-400 transition">
+                💧 Water Ice & ISRU Loops
+            </button>
+            <button data-constraint="eclss" class="constraint-btn rounded-md border border-slate-700 bg-slate-950 px-2.5 py-1 text-slate-300 hover:border-cyan-400 transition">
+                🌿 ECLSS Life Support
+            </button>
+            <button data-constraint="thermal" class="constraint-btn rounded-md border border-slate-700 bg-slate-950 px-2.5 py-1 text-slate-300 hover:border-cyan-400 transition">
+                🌡️ Thermal Delta (-130°C to +120°C)
+            </button>
+        </div>
+
+        <div class="hidden lg:flex items-center space-x-4 text-slate-400 text-[11px]">
+            <span>LOCATION: <strong class="text-slate-200">Shackleton Rim (89.9°S)</strong></span>
+            <span>AMB. TEMP: <strong class="text-amber-300">-130°C / +120°C</strong></span>
+        </div>
+    </div>
+
+    <!-- MAIN INTERACTIVE WORKSPACE -->
+    <div class="relative flex flex-1 overflow-hidden">
+
+        <!-- FLOATING ZOOM CONTROLS -->
+        <div class="absolute right-4 top-4 z-20 flex flex-col space-y-1.5 rounded-lg border border-nasa-border bg-nasa-dark/90 p-1.5 backdrop-blur-md shadow-2xl">
+            <button id="zoomInBtn" title="Zoom In" class="flex h-8 w-8 items-center justify-center rounded border border-slate-700 bg-slate-900 text-nasa-cyan hover:border-nasa-cyan hover:bg-slate-800 font-mono text-lg font-bold transition">+</button>
+            <button id="zoomOutBtn" title="Zoom Out" class="flex h-8 w-8 items-center justify-center rounded border border-slate-700 bg-slate-900 text-nasa-cyan hover:border-nasa-cyan hover:bg-slate-800 font-mono text-lg font-bold transition">−</button>
+            <button id="resetViewBtn" title="Reset Camera View" class="flex h-8 w-8 items-center justify-center rounded border border-slate-700 bg-slate-900 text-nasa-cyan hover:border-nasa-cyan hover:bg-slate-800 text-xs font-mono transition">🎯</button>
+        </div>
+
+        <!-- INTERACTIVE MAP VIEWPORT -->
+        <main id="mapViewport" class="relative flex-1 cursor-grab active:cursor-grabbing overflow-hidden bg-grid-pattern bg-nasa-dark">
+            
+            <!-- Scanline Overlay -->
+            <div class="pointer-events-none absolute inset-0 z-10 opacity-15 overflow-hidden">
+                <div class="h-24 w-full bg-gradient-to-b from-transparent via-cyan-400/20 to-transparent animate-scanline"></div>
+            </div>
+
+            <!-- MAP TRANSFORM CONTAINER -->
+            <div id="mapTransformContainer" class="absolute left-0 top-0 h-full w-full transform-gpu transition-transform duration-200 ease-out origin-center flex items-center justify-center">
+                
+                <!-- SVG BLUEPRINT ARCHITECTURE OVERLAY -->
+                <svg id="baseMapSvg" viewBox="0 0 1600 900" class="w-full h-full max-w-none select-none drop-shadow-2xl">
+                    <defs>
+                        <!-- Gradients -->
+                        <radialGradient id="craterGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#070c14"/>
+                            <stop offset="70%" stop-color="#101928"/>
+                            <stop offset="100%" stop-color="#1e2c40"/>
+                        </radialGradient>
+                        
+                        <radialGradient id="bioDomeGrad" cx="45%" cy="40%" r="60%">
+                            <stop offset="0%" stop-color="#00e676" stop-opacity="0.85"/>
+                            <stop offset="50%" stop-color="#02733c" stop-opacity="0.9"/>
+                            <stop offset="100%" stop-color="#012413"/>
+                        </radialGradient>
+
+                        <linearGradient id="solarPanelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00d2ff"/>
+                            <stop offset="100%" stop-color="#003865"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- LUNAR TERRAIN BASE GRAPHIC -->
+                    <rect width="1600" height="900" fill="#0b1320"/>
+
+                    <!-- Grid Overlay Lines -->
+                    <g opacity="0.12" stroke="#00d2ff" stroke-width="1" stroke-dasharray="4 8">
+                        <line x1="0" y1="150" x2="1600" y2="150"/>
+                        <line x1="0" y1="300" x2="1600" y2="300"/>
+                        <line x1="0" y1="450" x2="1600" y2="450"/>
+                        <line x1="0" y1="600" x2="1600" y2="600"/>
+                        <line x1="0" y1="750" x2="1600" y2="750"/>
+
+                        <line x1="260" y1="0" x2="260" y2="900"/>
+                        <line x1="530" y1="0" x2="530" y2="900"/>
+                        <line x1="800" y1="0" x2="800" y2="900"/>
+                        <line x1="1070" y1="0" x2="1070" y2="900"/>
+                        <line x1="1340" y1="0" x2="1340" y2="900"/>
+                    </g>
+
+                    <!-- Topographic Contour Lines -->
+                    <g opacity="0.25" fill="none" stroke="#2c415e" stroke-width="1.2">
+                        <path d="M -50 100 Q 150 20 380 90 T 600 30" />
+                        <path d="M -50 200 Q 180 120 400 180 T 650 100" />
+                        <path d="M 600 0 C 700 180 850 120 1100 100 T 1600 50" />
+                        <path d="M 500 900 C 600 700 800 680 1200 780 T 1650 900" stroke-width="2" stroke="#3b577d"/>
+                    </g>
+
+                    <!-- REGOLITH INFRASTRUCTURE CONDUITS & UTILITY TRUNKS -->
+                    <g opacity="0.4" stroke="#ffb300" stroke-width="1.8" stroke-dasharray="4 6" fill="none">
+                        <!-- Power & Fluid line from Solar Array to Bio-Domes -->
+                        <path d="M 1200 180 M 1200 180 L 980 290" stroke="#00d2ff"/>
+                        <!-- Pipe from Bio-Domes to Trench -->
+                        <path d="M 920 540 L 900 780" stroke="#00e676"/>
+                        <!-- Pipeline from Mining Rig to Bio-Domes -->
+                        <path d="M 460 410 Q 650 450 760 410" stroke="#ffb300"/>
+                    </g>
+
+                    <!-- SECTOR 1: CENTRAL BIO-DOME HABITAT ASSEMBLY -->
+                    <g id="sector-biodome-habitat" class="map-hotspot" data-sector="biodome-habitat">
+                        <!-- Tunnel Structural Links -->
+                        <path d="M 980 290 L 800 410 M 800 410 L 1030 530 M 980 290 L 1030 530" stroke="#4a5568" stroke-width="22" stroke-linecap="round"/>
+                        <path d="M 980 290 L 800 410 M 800 410 L 1030 530 M 980 290 L 1030 530" stroke="#00e676" stroke-width="5" stroke-linecap="round"/>
+
+                        <!-- Dome Alpha (Hydroponics & Air Scrubbing) -->
+                        <circle cx="980" cy="290" r="105" fill="url(#bioDomeGrad)" stroke="#00e676" stroke-width="3.5"/>
+                        <circle cx="980" cy="290" r="85" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5"/>
+                        <circle cx="980" cy="290" r="25" fill="#00e676" fill-opacity="0.5" stroke="#00e676" stroke-width="2"/>
+
+                        <!-- Dome Beta (Crew Habitat & Ergonomics) -->
+                        <circle cx="800" cy="410" r="115" fill="url(#bioDomeGrad)" stroke="#00e676" stroke-width="3.5"/>
+                        <circle cx="800" cy="410" r="95" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5"/>
+                        <circle cx="800" cy="410" r="28" fill="#00e676" fill-opacity="0.5" stroke="#00e676" stroke-width="2"/>
+
+                        <!-- Dome Gamma (ECLSS Command & Water Recycling) -->
+                        <circle cx="1030" cy="530" r="125" fill="url(#bioDomeGrad)" stroke="#00e676" stroke-width="3.5"/>
+                        <circle cx="1030" cy="530" r="100" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5"/>
+                        <circle cx="1030" cy="530" r="32" fill="#00e676" fill-opacity="0.5" stroke="#00e676" stroke-width="2"/>
+
+                        <path d="M 850 170 Q 1120 170 1180 430 T 930 680 T 660 410 Z" class="hotspot-shape" fill="cyan" fill-opacity="0.0" stroke="#00e676" stroke-opacity="0.4" stroke-width="2" stroke-dasharray="6 4"/>
+                    </g>
+
+                    <!-- SECTOR 2: SOLAR ARRAY FIELD & ENERGY STORAGE -->
+                    <g id="sector-solar-array" class="map-hotspot" data-sector="solar-array">
+                        <g fill="url(#solarPanelGrad)" stroke="#00d2ff" stroke-width="1">
+                            <rect x="1080" y="70" width="40" height="25" rx="2"/>
+                            <rect x="1130" y="70" width="40" height="25" rx="2"/>
+                            <rect x="1180" y="70" width="40" height="25" rx="2"/>
+                            <rect x="1230" y="70" width="40" height="25" rx="2"/>
+                            
+                            <rect x="1050" y="110" width="40" height="25" rx="2"/>
+                            <rect x="1100" y="110" width="40" height="25" rx="2"/>
+                            <rect x="1150" y="110" width="40" height="25" rx="2"/>
+                            <rect x="1200" y="110" width="40" height="25" rx="2"/>
+                            <rect x="1250" y="110" width="40" height="25" rx="2"/>
+
+                            <rect x="1200" y="160" width="40" height="25" rx="2"/>
+                            <rect x="1250" y="160" width="40" height="25" rx="2"/>
+                            <rect x="1300" y="160" width="40" height="25" rx="2"/>
+                            <rect x="1350" y="160" width="40" height="25" rx="2"/>
+
+                            <rect x="1230" y="200" width="40" height="25" rx="2"/>
+                            <rect x="1280" y="200" width="40" height="25" rx="2"/>
+                            <rect x="1330" y="200" width="40" height="25" rx="2"/>
+                            <rect x="1380" y="200" width="40" height="25" rx="2"/>
+                        </g>
+                        <path d="M 1030 50 L 1490 50 L 1490 250 L 1180 250 Z" class="hotspot-shape" fill="cyan" fill-opacity="0.0" stroke="#00d2ff" stroke-opacity="0.3" stroke-width="1.5" stroke-dasharray="5 5"/>
+                    </g>
+
+                    <!-- SECTOR 3: SUB-SURFACE SHIELDING TRENCH -->
+                    <g id="sector-subsurface-trench" class="map-hotspot" data-sector="subsurface-trench">
+                        <path d="M 650 710 L 1150 720 L 1100 880 L 680 870 Z" fill="#080e18" stroke="#2c415e" stroke-width="2"/>
+                        <path d="M 720 730 L 1080 735 L 1060 780 L 740 775 Z" fill="#1e293b" stroke="#00d2ff" stroke-width="2"/>
+                        
+                        <!-- Buried module observation ports -->
+                        <rect x="760" y="745" width="50" height="18" rx="2" fill="#00d2ff" fill-opacity="0.6"/>
+                        <rect x="830" y="746" width="50" height="18" rx="2" fill="#00d2ff" fill-opacity="0.6"/>
+                        <rect x="900" y="747" width="50" height="18" rx="2" fill="#00d2ff" fill-opacity="0.6"/>
+                        <rect x="970" y="748" width="50" height="18" rx="2" fill="#00d2ff" fill-opacity="0.6"/>
+
+                        <path d="M 630 690 L 1170 700 L 1120 895 L 650 885 Z" class="hotspot-shape" fill="cyan" fill-opacity="0.0" stroke="#00d2ff" stroke-opacity="0.4" stroke-width="2"/>
+                    </g>
+
+                    <!-- SECTOR 4: HEAVY ISRU & REGOLITH SINTERING PAD -->
+                    <g id="sector-isru-sintering" class="map-hotspot" data-sector="isru-sintering">
+                        <polygon points="340,320 540,320 540,510 340,510" fill="#111c2e" stroke="#2c415e" stroke-width="2"/>
+                        <rect x="360" y="340" width="160" height="150" fill="none" stroke="#ffb300" stroke-width="1" stroke-dasharray="4 4"/>
+                        <line x1="370" y1="410" x2="490" y2="410" stroke="#ffb300" stroke-width="6"/>
+                        <circle cx="490" cy="410" r="14" fill="#ffb300" stroke="#000" stroke-width="2"/>
+                        
+                        <polygon points="330,250 610,250 610,520 330,520" class="hotspot-shape" fill="amber" fill-opacity="0.0" stroke="#ffb300" stroke-opacity="0.4" stroke-width="1.5"/>
+                    </g>
+
+                    <!-- SECTOR 5: COMMUNICATIONS & ORBITAL RELAY ANTENNA -->
+                    <g id="sector-comms-array" class="map-hotspot" data-sector="comms-array">
+                        <circle cx="1320" cy="510" r="22" fill="#1e293b" stroke="#00d2ff" stroke-width="2"/>
+                        <path d="M 1305 510 C 1305 495 1335 495 1335 510 Z" fill="#00d2ff" fill-opacity="0.5"/>
+                        <line x1="1320" y1="510" x2="1340" y2="480" stroke="#00d2ff" stroke-width="2"/>
+
+                        <circle cx="1380" cy="520" r="18" fill="#1e293b" stroke="#00d2ff" stroke-width="2"/>
+                        <path d="M 1368 520 C 1368 508 1392 508 1392 520 Z" fill="#00d2ff" fill-opacity="0.5"/>
+
+                        <circle cx="1350" cy="515" r="55" class="hotspot-shape" fill="cyan" fill-opacity="0.0" stroke="#00d2ff" stroke-opacity="0.3" stroke-width="1.5"/>
+                    </g>
+
+                    <!-- SECTOR 6: PERMANENTLY SHADOWED IMPACT CRATER (PSR) -->
+                    <g id="sector-psr-crater" class="map-hotspot" data-sector="psr-crater">
+                        <circle cx="260" cy="210" r="140" fill="url(#craterGrad)" stroke="#2c415e" stroke-width="3"/>
+                        <circle cx="260" cy="210" r="110" fill="none" stroke="#101928" stroke-width="2" stroke-dasharray="8 6"/>
+                        <circle cx="260" cy="210" r="35" fill="#05080e" stroke="#00d2ff" stroke-width="1.5"/>
+                        
+                        <!-- Water Ice Sublimation Rig Marker -->
+                        <polygon points="260,195 272,220 248,220" fill="#b388ff" opacity="0.8"/>
+                        
+                        <circle cx="260" cy="210" r="145" class="hotspot-shape" fill="purple" fill-opacity="0.0" stroke="#b388ff" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="6 4"/>
+                    </g>
+
+                    <!-- SECTOR 7: LOGISTICS PAD & PLUME MITIGATION BERM -->
+                    <g id="sector-logistics-pad" class="map-hotspot" data-sector="logistics-pad">
+                        <g fill="#334155" stroke="#00d2ff" stroke-width="1">
+                            <rect x="1200" y="420" width="16" height="16" rx="1"/>
+                            <rect x="1220" y="420" width="16" height="16" rx="1"/>
+                            <rect x="1240" y="420" width="16" height="16" rx="1"/>
+                        </g>
+                        <!-- Tracked Logistics Vehicle -->
+                        <rect x="1150" y="450" width="35" height="22" rx="3" fill="#ffb300" stroke="#000" stroke-width="1.5"/>
+                        
+                        <rect x="1130" y="405" width="140" height="80" rx="8" class="hotspot-shape" fill="cyan" fill-opacity="0.0" stroke="#00d2ff" stroke-opacity="0.3" stroke-width="1.5"/>
+                    </g>
+
+                    <!-- OVERLAY: SECTOR IDENTIFIER LABELS & PINGS -->
+                    <g id="layer-labels" class="font-mono text-[11px] font-bold tracking-wider" fill="#ffffff">
+                        <!-- Bio-Dome Label -->
+                        <g transform="translate(900, 390)">
+                            <circle cx="0" cy="0" r="18" fill="#00e676" fill-opacity="0.2" stroke="#00e676" stroke-width="2" class="ping-ring"/>
+                            <circle cx="0" cy="0" r="5" fill="#00e676"/>
+                            <rect x="12" y="-12" width="195" height="24" rx="4" fill="#0e1726" fill-opacity="0.9" stroke="#00e676" stroke-width="1"/>
+                            <text x="20" y="4" fill="#00e676">SEC-01: HABITAT BIO-DOMES</text>
+                        </g>
+
+                        <!-- Solar Array Label -->
+                        <g transform="translate(1220, 140)">
+                            <circle cx="0" cy="0" r="5" fill="#00d2ff"/>
+                            <rect x="12" y="-12" width="190" height="24" rx="4" fill="#0e1726" fill-opacity="0.9" stroke="#00d2ff" stroke-width="1"/>
+                            <text x="20" y="4" fill="#00d2ff">SEC-02: SOLAR PV FIELD</text>
+                        </g>
+
+                        <!-- Shielding Trench Label -->
+                        <g transform="translate(860, 800)">
+                            <circle cx="0" cy="0" r="5" fill="#00d2ff"/>
+                            <rect x="12" y="-12" width="210" height="24" rx="4" fill="#0e1726" fill-opacity="0.9" stroke="#00d2ff" stroke-width="1"/>
+                            <text x="20" y="4" fill="#00d2ff">SEC-03: SHIELDING TRENCH</text>
+                        </g>
+
+                        <!-- ISRU Pad Label -->
+                        <g transform="translate(440, 420)">
+                            <circle cx="0" cy="0" r="5" fill="#ffb300"/>
+                            <rect x="12" y="-12" width="190" height="24" rx="4" fill="#0e1726" fill-opacity="0.9" stroke="#ffb300" stroke-width="1"/>
+                            <text x="20" y="4" fill="#ffb300">SEC-04: ISRU SINTERING</text>
+                        </g>
+
+                        <!-- Comms Label -->
+                        <g transform="translate(1350, 490)">
+                            <circle cx="0" cy="0" r="5" fill="#00d2ff"/>
+                            <rect x="12" y="-12" width="180" height="24" rx="4" fill="#0e1726" fill-opacity="0.9" stroke="#00d2ff" stroke-width="1"/>
+                            <text x="20" y="4" fill="#00d2ff">SEC-05: COMMS RELAY</text>
+                        </g>
+
+                        <!-- PSR Crater Label -->
+                        <g transform="translate(260, 210)">
+                            <circle cx="0" cy="0" r="5" fill="#b388ff"/>
+                            <rect x="12" y="-12" width="180" height="24" rx="4" fill="#0e1726" fill-opacity="0.9" stroke="#b388ff" stroke-width="1"/>
+                            <text x="20" y="4" fill="#b388ff">SEC-06: PSR WATER ICE</text>
+                        </g>
+                    </g>
+                </svg>
+
+            </div>
+
+            <!-- HOVER TOOLTIP HUD -->
+            <div id="hudTooltip" class="pointer-events-none fixed z-40 hidden -translate-x-1/2 -translate-y-full pb-3 transition-opacity duration-150">
+                <div class="relative rounded-lg border border-cyan-400/80 bg-nasa-dark/95 p-3 shadow-tech-glow backdrop-blur-md min-w-[220px]">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-1.5 mb-1.5">
+                        <span id="tooltipCode" class="font-mono text-[10px] text-cyan-400 font-bold">SEC-01</span>
+                        <span id="tooltipCategory" class="rounded bg-cyan-500/20 px-1.5 py-0.5 font-mono text-[9px] text-nasa-cyan font-semibold">ECLSS</span>
+                    </div>
+                    <h4 id="tooltipTitle" class="font-mono text-sm font-bold text-white mb-1">Habitat Bio-Dome Assembly</h4>
+                    <p id="tooltipStat" class="font-mono text-xs text-slate-300 mb-2">3.5m Regolith Mass Shielding</p>
+                    <div class="flex items-center text-[10px] font-mono text-nasa-emerald">
+                        <span>CLICK TO EVALUATE SYSTEM DESIGN</span>
+                        <span class="ml-1">→</span>
+                    </div>
+                    <div class="absolute bottom-0 left-1/2 h-2.5 w-2.5 -translate-x-1/2 translate-y-1/2 rotate-45 border-b border-r border-cyan-400/80 bg-nasa-dark"></div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- SECTOR DIRECTORY SIDEBAR -->
+        <aside id="sectorSidebar" class="relative z-20 w-80 border-l border-nasa-border bg-nasa-dark/95 backdrop-blur-lg flex flex-col transition-all duration-300">
+            <div class="flex items-center justify-between border-b border-slate-800 px-4 py-3">
+                <div class="flex items-center space-x-2">
+                    <span class="h-2 w-2 rounded-full bg-nasa-cyan animate-pulse"></span>
+                    <h2 class="font-mono text-xs font-bold uppercase tracking-wider text-cyan-300">BASE INFRASTRUCTURE</h2>
+                </div>
+                <button id="closeSidebarBtn" class="text-slate-400 hover:text-white font-mono text-xs">✕</button>
+            </div>
+
+            <div id="sidebarList" class="flex-1 overflow-y-auto p-3 space-y-2">
+                <!-- Dynamically populated via JS -->
+            </div>
+
+            <div class="border-t border-slate-800 p-3 bg-slate-900/60 text-[11px] font-mono text-slate-400 text-center">
+                EINSTEIN MOON BASE CAMP // ACADEMIC EVALUATION PORTAL
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- JURY GUIDED TOUR HUD OVERLAY BAR (Bottom) -->
+    <div id="tourHudBar" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 hidden w-full max-w-2xl rounded-xl border border-nasa-emerald bg-nasa-dark/98 p-4 shadow-green-glow backdrop-blur-xl font-mono text-xs">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
+            <div class="flex items-center space-x-2">
+                <span class="rounded bg-emerald-500/20 px-2 py-0.5 text-hud-green font-bold text-[10px]">JURY PRESENTATION MODE</span>
+                <span id="tourStepIndicator" class="text-slate-400 text-[11px]">STEP 1 OF 7</span>
+            </div>
+            <button id="exitTourBtn" class="text-slate-400 hover:text-white text-xs">EXIT TOUR ✕</button>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h3 id="tourSectorTitle" class="text-sm font-bold text-white mb-0.5">Central Bio-Dome Habitat Assembly</h3>
+                <p id="tourProblemSummary" class="text-[11px] text-slate-300 font-sans line-clamp-2">
+                    Core Challenge: Sustaining 48-crew closed-loop atmospheric recycling & blocking 300 mSv/yr GCR radiation.
+                </p>
+            </div>
+            
+            <div class="flex items-center space-x-2 shrink-0">
+                <button id="tourPrevBtn" class="rounded border border-slate-700 bg-slate-900 px-2.5 py-1 text-slate-300 hover:border-nasa-cyan hover:text-white transition">← PREV</button>
+                <button id="tourNextBtn" class="rounded border border-nasa-emerald bg-emerald-950 px-3 py-1 text-nasa-emerald font-bold hover:bg-emerald-900 transition">NEXT →</button>
+                <a id="tourSimLink" href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/" target="_blank" rel="noopener" class="rounded bg-nasa-cyan px-2.5 py-1 font-bold text-slate-950 hover:bg-cyan-300 transition">SIM ↗</a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SECTOR TECHNICAL DETAIL DRAWER -->
+    <div id="detailDrawer" class="fixed inset-y-0 right-0 z-50 w-full max-w-xl transform translate-x-full border-l border-nasa-border bg-nasa-dark/98 backdrop-blur-2xl shadow-2xl transition-transform duration-300 flex flex-col">
+        
+        <!-- Drawer Header -->
+        <div class="relative border-b border-nasa-border bg-slate-900/90 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div id="drawerIcon" class="flex h-10 w-10 items-center justify-center rounded-lg border border-cyan-500/50 bg-cyan-950/50 text-xl text-nasa-cyan">
+                    🌿
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span id="drawerCode" class="font-mono text-xs text-nasa-cyan font-bold">SEC-01</span>
+                        <span id="drawerCategory" class="rounded bg-cyan-500/20 px-2 py-0.5 font-mono text-[10px] text-nasa-cyan font-bold">ECLSS & HUMAN FACTORS</span>
+                    </div>
+                    <h2 id="drawerTitle" class="font-mono text-base font-bold text-white">Central Bio-Dome Habitat Assembly</h2>
+                </div>
+            </div>
+            <button id="closeDrawerBtn" class="rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-300 hover:border-cyan-400 hover:text-white transition">
+                ✕
+            </button>
+        </div>
+
+        <!-- SIMULATION ACTION HEADER BAR -->
+        <div class="bg-slate-900/80 px-6 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+            <div class="font-mono text-xs text-slate-300">
+                <span class="text-slate-500">SIMULATION ROUTE:</span>
+                <span id="drawerSimRoute" class="text-nasa-cyan ml-1">/sim/biodome</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button id="viewCalcsBtn" class="rounded border border-slate-700 bg-slate-800 px-2.5 py-1 font-mono text-[11px] text-slate-200 hover:border-cyan-400 hover:text-white transition">
+                    📐 CALCULATIONS
+                </button>
+                <a id="launchSimBtn" href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/" target="_blank" rel="noopener" class="flex items-center space-x-1.5 rounded-md border border-nasa-cyan bg-cyan-500/20 px-3 py-1 font-mono text-xs font-bold text-nasa-cyan hover:bg-nasa-cyan hover:text-slate-950 transition shadow-tech-glow">
+                    <span>LAUNCH LIVE SIMULATION</span>
+                    <span>↗</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Drawer Body Content -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-5 font-mono">
+            
+            <!-- Core Environmental Challenge & Student Engineering Solution -->
+            <div class="rounded-lg border border-slate-800 bg-slate-900/70 p-4 space-y-3">
+                <div>
+                    <h3 class="text-xs font-bold uppercase text-amber-400 tracking-wider mb-1">1. ENVIRONMENTAL CONSTRAINT & PROBLEM</h3>
+                    <p id="drawerProblemText" class="font-sans text-xs text-slate-300 leading-relaxed">
+                        Galactic Cosmic Rays (GCR) deliver ~300 mSv/year, far exceeding NASA career limits. Atmospheric vacuum requires maintaining 101.3 kPa internal pressure while enduring 250°C diurnal thermal swings.
+                    </p>
+                </div>
+                
+                <div class="border-t border-slate-800 pt-3">
+                    <h3 class="text-xs font-bold uppercase text-nasa-emerald tracking-wider mb-1">2. STUDENT DESIGN SOLUTION</h3>
+                    <p id="drawerSolutionText" class="font-sans text-xs text-slate-300 leading-relaxed">
+                        Tri-dome pneumatic Kevlar-inflatable structure encapsulated beneath a 3.5m microwave-sintered regolith protective vault, combining passive radiation attenuation with closed-loop hydro-ECLSS.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Trade-off Matrix -->
+            <div class="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
+                <h3 class="text-xs font-bold uppercase text-cyan-300 tracking-wider mb-2">3. ENGINEERING TRADE-OFF MATRIX</h3>
+                <p id="drawerTradeoffText" class="font-sans text-xs text-slate-300 leading-relaxed">
+                    <strong>Inflatable Kevlar Membrane vs. Metallic Module:</strong> Kevlar reduces launch payload volume by 68% and structural mass by 42%, but requires early-mission deployment before regolith vault sintering can occur.
+                </p>
+            </div>
+
+            <!-- Key Design Metrics Grid -->
+            <div>
+                <h3 class="text-xs font-bold uppercase text-slate-400 mb-3 tracking-wider">4. KEY PERFORMANCE PARAMETERS</h3>
+                <div id="drawerMetricsGrid" class="grid grid-cols-2 gap-3">
+                    <!-- Injected JS -->
+                </div>
+            </div>
+
+            <!-- Subsystem Verification Checklist -->
+            <div>
+                <h3 class="text-xs font-bold uppercase text-slate-400 mb-2 tracking-wider">5. SYSTEM ARCHITECTURE CHECKLIST</h3>
+                <div id="drawerSubsystemsList" class="space-y-1.5 text-xs">
+                    <!-- Injected JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Drawer Footer -->
+        <div class="border-t border-slate-800 bg-slate-950 p-4 flex items-center justify-between">
+            <button id="drawerBackToMapBtn" class="flex items-center space-x-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 font-mono text-xs text-slate-300 hover:border-nasa-cyan hover:text-nasa-cyan transition">
+                <span>← BACK TO MAP</span>
+            </button>
+            <button id="downloadBriefBtn" class="rounded border border-emerald-500/50 bg-emerald-950/30 px-3 py-1.5 font-mono text-xs font-bold text-nasa-emerald hover:bg-emerald-900/50 transition">
+                📄 ENGINEERING BRIEF PDF
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ENGINEERING CALCULATIONS MODAL -->
+    <div id="calcsModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="relative w-full max-w-2xl rounded-xl border border-nasa-cyan bg-nasa-dark p-6 shadow-tech-glow space-y-4 font-mono text-xs">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-nasa-cyan text-lg">📐</span>
+                    <h3 id="calcsModalTitle" class="text-sm font-bold text-white">DESIGN CALCULATIONS: HABITAT SHIELDING</h3>
+                </div>
+                <button id="closeCalcsModalBtn" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <div id="calcsModalContent" class="space-y-3 font-sans text-xs text-slate-300 max-h-[60vh] overflow-y-auto p-1">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="border-t border-slate-800 pt-3 flex items-center justify-between font-mono">
+                <span class="text-[11px] text-slate-500">EINSTEIN MOON BASE CAMP // TECHNICAL ANNEX</span>
+                <button id="closeCalcsModalBtn2" class="rounded bg-slate-800 px-4 py-1.5 text-white hover:bg-slate-700 transition">
+                    CLOSE
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- DEVELOPER MAP & COORDINATE CALIBRATION TOOL MODAL -->
+    <div id="devToolModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="relative w-full max-w-2xl rounded-xl border border-amber-500/50 bg-nasa-dark p-6 shadow-2xl space-y-5 font-mono text-xs">
+            
+            <div class="flex items-center justify-between border-b border-amber-500/30 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-amber-400 text-lg">⚙️</span>
+                    <h3 class="text-sm font-bold text-amber-300">MAP IMAGE & HOTSPOT CALIBRATION TOOL</h3>
+                </div>
+                <button id="closeDevToolBtn" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <p class="text-slate-300 font-sans text-xs leading-relaxed">
+                Use this tool to swap the background blueprint image or inspect relative SVG coordinates when updating final team renders before your jury presentation.
+            </p>
+
+            <div class="space-y-3 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+                <h4 class="font-bold text-cyan-300 uppercase">1. Custom Background Map Image URL</h4>
+                <div class="flex space-x-2">
+                    <input type="text" id="customImageUrlInput" placeholder="Paste image URL (e.g. https://.../moon-base-blueprint.jpg)..." 
+                        class="flex-1 rounded border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none">
+                    <button id="applyCustomImageBtn" class="rounded bg-amber-500 px-3 py-1.5 font-bold text-slate-950 hover:bg-amber-400 transition">APPLY</button>
+                </div>
+                <div class="flex items-center space-x-2 text-[11px] text-slate-400">
+                    <span>Or local image file:</span>
+                    <input type="file" id="customFileUpload" accept="image/*" class="text-xs text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-800 file:px-2 file:py-1 file:text-xs file:text-cyan-300">
+                </div>
+            </div>
+
+            <div class="space-y-3 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+                <div class="flex items-center justify-between">
+                    <h4 class="font-bold text-cyan-300 uppercase">2. Coordinate Click Inspector</h4>
+                    <button id="toggleDevInspectBtn" class="rounded border border-amber-500/50 bg-amber-950/40 px-2.5 py-1 text-amber-300 hover:bg-amber-900/50 transition">
+                        INSPECTOR MODE: <span id="inspectModeStatus">OFF</span>
+                    </button>
+                </div>
+                <div id="devCoordOutput" class="rounded border border-slate-800 bg-slate-950 p-2.5 text-nasa-emerald font-mono text-[11px] break-all">
+                    Enable Inspector Mode then click anywhere on the map to log exact relative coordinates...
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-slate-800 pt-3">
+                <button id="copySectorJsonBtn" class="rounded border border-cyan-500/40 bg-cyan-950/40 px-3 py-1.5 text-nasa-cyan hover:bg-cyan-900/50 transition">
+                    📋 COPY SECTOR CONFIG JSON
+                </button>
+                <button id="closeDevToolBtn2" class="rounded bg-slate-800 px-4 py-1.5 text-white hover:bg-slate-700 transition">
+                    DONE
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT APPLICATION CONTROLLER -->
+    <script>
+        // ==========================================
+        // 1. GROUNDED ACADEMIC SECTOR DATA DICTIONARY
+        // ==========================================
+        const SECTORS_DATA = [
+            {
+                id: "biodome-habitat",
+                code: "SEC-01",
+                title: "Central Bio-Dome Habitat Assembly",
+                category: "ECLSS & Human Factors",
+                constraints: ["eclss", "radiation", "thermal"],
+                icon: "🌿",
+                simRoute: "https://pieter-smets.github.io/Einstein-Moon-Base-Camp/#/biodome",
+                center: { x: 930, y: 410 },
+                problem: "Galactic Cosmic Rays (GCR) deliver ~300 mSv/year (100x Earth background). Atmospheric vacuum requires sustaining 101.3 kPa internal pressure while enduring +120°C to -130°C thermal cycling.",
+                solution: "Tri-dome pneumatic Kevlar-inflatable structure encased beneath a 3.5m microwave-sintered regolith protective arch, combining passive radiation attenuation with closed-loop hydro-ECLSS.",
+                tradeoff: "Inflatable Kevlar vs. Rigid Metallic Modules: Inflatables reduce Earth launch mass by 42% and stowed volume by 68%, but require early-mission inflation before the protective regolith sintering vault is completed.",
+                metrics: [
+                    { label: "Regolith Shielding", value: "3.5 Meters", color: "text-nasa-emerald" },
+                    { label: "GCR Dose Rate", value: "<15 mSv/yr", color: "text-nasa-cyan" },
+                    { label: "O2 Loop Closure", value: "94.2%", color: "text-nasa-emerald" },
+                    { label: "H2O Loop Closure", value: "98.5%", color: "text-nasa-emerald" }
+                ],
+                subsystems: [
+                    { name: "Pneumatic Dual-Layer Kevlar Bladder", ok: true },
+                    { name: "Hydroponic Crop Gas Exchanger", ok: true },
+                    { name: "Sabatier CO2 Reduction Unit", ok: true },
+                    { name: "Vapor Compression Water Recycling", ok: true }
+                ],
+                calculationsHtml: `
+                    <p class="font-semibold text-cyan-300">Radiation Attenuation Formula (Beer-Lambert Law):</p>
+                    <p class="bg-slate-900 p-2 rounded text-emerald-400">I = I₀ · e^(-μx)</p>
+                    <p>Where linear attenuation coefficient μ = 0.052 cm⁻¹ for lunar regolith (density ρ ≈ 1.5 g/cm³). At depth x = 350 cm:</p>
+                    <p class="bg-slate-900 p-2 rounded text-cyan-200">I / I₀ = e^(-0.052 · 350) ≈ 1.25 × 10⁻⁸</p>
+                    <p>This reduces annual Galactic Cosmic Ray equivalent dose from 300 mSv/yr down to &lt;0.05 mSv/yr, well under NASA's 50 mSv/yr safety threshold for astronauts.</p>
+                `
+            },
+            {
+                id: "solar-array",
+                code: "SEC-02",
+                title: "Solar Array Field & Regenerative Fuel Cell",
+                category: "Power Infrastructure",
+                constraints: ["power", "thermal"],
+                icon: "⚡",
+                simRoute: "https://pieter-smets.github.io/Einstein-Moon-Base-Camp/#/power",
+                center: { x: 1250, y: 150 },
+                problem: "Surviving the 354-hour continuous lunar night (-130°C ambient) at the south pole rim without access to nuclear thermal mass generators.",
+                solution: "Bifacial PV solar tracking panels positioned on high-elevation crater rim (86% solar illumination) coupled to a 12 MWh Regenerative Hydrogen Fuel Cell (RFC) energy storage bank.",
+                tradeoff: "Regenerative Fuel Cells (RFC) vs. Li-ion Batteries: RFCs provide 450 Wh/kg specific energy compared to 250 Wh/kg for Li-ion, saving 18.4 metric tons of payload launch mass.",
+                metrics: [
+                    { label: "PV Peak Capacity", value: "4.8 MW", color: "text-nasa-cyan" },
+                    { label: "RFC Storage", value: "12.0 MWh", color: "text-amber-300" },
+                    { label: "Rim Sunlight Availability", value: "86.4%", color: "text-nasa-emerald" },
+                    { label: "System Specific Energy", value: "450 Wh/kg", color: "text-nasa-cyan" }
+                ],
+                subsystems: [
+                    { name: "Bifacial Solar Panel Azimuth Trackers", ok: true },
+                    { name: "PEM High-Pressure Electrolyzer", ok: true },
+                    { name: "Cryogenic H2/O2 Pressure Tanks", ok: true }
+                ],
+                calculationsHtml: `
+                    <p class="font-semibold text-cyan-300">Night Survival Power Budget Equation:</p>
+                    <p class="bg-slate-900 p-2 rounded text-emerald-400">E_night = P_base · t_night = (35 kW) · (354 h) = 12,390 kWh ≈ 12.4 MWh</p>
+                    <p>Required H2 mass for fuel cell operating at 60% efficiency (LHV of H2 = 33.3 kWh/kg):</p>
+                    <p class="bg-slate-900 p-2 rounded text-cyan-200">m_H2 = E_night / (0.60 · 33.3) = 620 kg H2</p>
+                `
+            },
+            {
+                id: "subsurface-trench",
+                code: "SEC-03",
+                title: "Sub-Surface Cut-and-Cover Shielding Trench",
+                category: "Structural & Radiation Defense",
+                constraints: ["radiation", "thermal"],
+                icon: "🛡️",
+                simRoute: "https://pieter-smets.github.io/Einstein-Moon-Base-Camp/#/trench",
+                center: { x: 900, y: 790 },
+                problem: "Solar Particle Events (SPE) produce lethal proton bursts up to 10 Gy/hr. Unshielded surface modules experience extreme thermal expansion stress.",
+                solution: "Cut-and-cover excavation into basaltic ridge placing crew sleep quarters and quantum computing cores under 3.5m compacted regolith, achieving a constant thermal equilibrium of -20°C.",
+                tradeoff: "Excavation Energy Cost vs. Active Thermal Power: Trench digging requires 420 kWh of initial heavy machinery power, but saves 14 kW of continuous HVAC heating power during lunar night.",
+                metrics: [
+                    { label: "Buried Vault Depth", value: "4.2 Meters", color: "text-nasa-emerald" },
+                    { label: "Equilibrium Temp", value: "-20 °C", color: "text-nasa-cyan" },
+                    { label: "SPE Attenuation", value: "99.99%", color: "text-nasa-emerald" },
+                    { label: "HVAC Energy Savings", value: "14.2 kW", color: "text-nasa-emerald" }
+                ],
+                subsystems: [
+                    { name: "UHMWPE Polymer SPE Proton Liner", ok: true },
+                    { name: "Basaltic Anchored Retaining Walls", ok: true },
+                    { name: "Automated Pressure Lock Tunnels", ok: true }
+                ],
+                calculationsHtml: `
+                    <p class="font-semibold text-cyan-300">Regolith Thermal Damping Depth (Penetration Depth):</p>
+                    <p class="bg-slate-900 p-2 rounded text-emerald-400">d_p = √( (k · T_period) / (π · ρ · c_p) )</p>
+                    <p>For lunar regolith thermal conductivity k = 0.015 W/m·K, density ρ = 1500 kg/m³, heat capacity c_p = 800 J/kg·K. At a depth of >0.8m, the 250°C surface diurnal temperature swing is damped down to a stable -20°C (±1°C).</p>
+                `
+            },
+            {
+                id: "isru-sintering",
+                code: "SEC-04",
+                title: "ISRU Regolith Sintering & Manufacturing Pad",
+                category: "In-Situ Resource Utilization",
+                constraints: ["isru", "thermal"],
+                icon: "⛏️",
+                simRoute: "https://pieter-smets.github.io/Einstein-Moon-Base-Camp/#/isru",
+                center: { x: 470, y: 390 },
+                problem: "Launching 1 kg of construction material from Earth to the Moon costs ~$1.2M. Surface dust causes severe mechanical abrasion to unshielded joints.",
+                solution: "Concentrated 2.45 GHz microwave sintering rovers that melt local regolith into interlocking structural pavement tiles and radiation arches without fluid binders.",
+                tradeoff: "Microwave Sintering vs. Solar Concentrator Melting: Microwave sintering provides uniform volumetric heating across 10cm depth, preventing surface cracking inherent in solar optical melting.",
+                metrics: [
+                    { label: "Tile Sinter Rate", value: "12 m²/day", color: "text-amber-300" },
+                    { label: "Compressive Strength", value: "48 MPa", color: "text-nasa-emerald" },
+                    { label: "Microwave Power", value: "15 kW @ 2.45GHz", color: "text-nasa-cyan" },
+                    { label: "Earth Mass Saved", value: "142 Metric Tons", color: "text-nasa-emerald" }
+                ],
+                subsystems: [
+                    { name: "2.45 GHz Magnetron Sintering Horn", ok: true },
+                    { name: "Automated Regolith Leveller", ok: true },
+                    { name: "3D Robotic Arch Constructor", ok: true }
+                ],
+                calculationsHtml: `
+                    <p class="font-semibold text-cyan-300">Energy Required for Microwave Regolith Sintering:</p>
+                    <p class="bg-slate-900 p-2 rounded text-emerald-400">Q = m · c_p · ΔT + m · ΔH_fusion</p>
+                    <p>To heat 1 kg of regolith from 250 K to sintering temperature 1350 K (c_p = 1000 J/kg·K):</p>
+                    <p class="bg-slate-900 p-2 rounded text-cyan-200">Q = 1.0 kg · 1000 J/kg·K · 1100 K = 1.1 MJ/kg ≈ 0.306 kWh/kg</p>
+                `
+            },
+            {
+                id: "comms-array",
+                code: "SEC-05",
+                title: "Ka-Band Deep Space Antenna Array",
+                category: "Telecommunications",
+                constraints: ["power"],
+                icon: "📡",
+                simRoute: "https://pieter-smets.github.io/Einstein-Moon-Base-Camp/#/telemetry",
+                center: { x: 1350, y: 515 },
+                problem: "Direct-to-Earth line-of-sight is lost during lunar libration cycles; high-resolution digital twin telemetry requires >500 Mbps continuous bandwidth.",
+                solution: "Dual 12m steerable parabolic dishes operating at 32 GHz Ka-band, integrated with optical laser terminals linked to Halo orbit lunar relay satellites.",
+                tradeoff: "Ka-Band RF vs. Optical Laser Communication: Optical lasers achieve 2.5 Gbps bandwidth at 15% lower mass, but require backup Ka-band antennas during Earth atmospheric cloud cover.",
+                metrics: [
+                    { label: "Downlink Speed", value: "1.2 Gbps", color: "text-nasa-cyan" },
+                    { label: "RF Frequency", value: "32 GHz (Ka-Band)", color: "text-slate-300" },
+                    { label: "Signal Latency", value: "1.28 Seconds", color: "text-nasa-emerald" },
+                    { label: "Orbital Relay Link", value: "L2 Halo Orbiter", color: "text-nasa-cyan" }
+                ],
+                subsystems: [
+                    { name: "Thermally Compensated Carbon Dishes", ok: true },
+                    { name: "Deep Space Network (DSN) Transceiver", ok: true },
+                    { name: "Laser Optical Terminal", ok: true }
+                ],
+                calculationsHtml: `
+                    <p class="font-semibold text-cyan-300">Free Space Path Loss (FSPL) at 384,000 km for 32 GHz:</p>
+                    <p class="bg-slate-900 p-2 rounded text-emerald-400">FSPL (dB) = 20 log₁₀(d) + 20 log₁₀(f) + 92.45</p>
+                    <p class="bg-slate-900 p-2 rounded text-cyan-200">FSPL = 20 log₁₀(384000) + 20 log₁₀(32) + 92.45 ≈ 234.2 dB</p>
+                    <p>High-gain 12m dish antenna gain (G = 68 dBi) compensates for path loss, maintaining a +6.5 dB Eb/N0 signal link margin.</p>
+                `
+            },
+            {
+                id: "psr-crater",
+                code: "SEC-06",
+                title: "Permanently Shadowed Region (PSR) Ice Extraction",
+                category: "Cryogenic Volatiles & ISRU",
+                constraints: ["isru", "thermal"],
+                icon: "💧",
+                simRoute: "https://pieter-smets.github.io/Einstein-Moon-Base-Camp/#/water",
+                center: { x: 260, y: 210 },
+                problem: "Water ice is trapped in 40 Kelvin permanently shadowed crater floors; cold temperatures freeze conventional lubricants and crack metal tools.",
+                solution: "Autonomous sublimation tents with heliostat mirror arrays that reflect sunlight into the crater, vaporizing ice at 5.8% regolith mass density and capturing H2O in cryogenic cold traps.",
+                tradeoff: "Thermal Sublimation vs. Mechanical Excavation: Sublimation leaves heavy abrasive gravel behind, preventing mechanical wear on excavator tracks in 40K conditions.",
+                metrics: [
+                    { label: "Regolith Ice Density", value: "5.8% Mass", color: "text-nasa-cyan" },
+                    { label: "Crater Floor Temp", value: "42 Kelvin (-231°C)", color: "text-purple-300" },
+                    { label: "H2O Yield Target", value: "25 Metric Tons/yr", color: "text-nasa-emerald" },
+                    { label: "Heliostat Mirror Efficiency", value: "88%", color: "text-nasa-cyan" }
+                ],
+                subsystems: [
+                    { name: "Inflatable Thermal Sublimation Canopy", ok: true },
+                    { name: "Cryogenic Desublimation Cold Trap", ok: true },
+                    { name: "Automated Water Quality Analyzer", ok: true }
+                ],
+                calculationsHtml: `
+                    <p class="font-semibold text-cyan-300">Sublimation Heat of Ice at Low Pressure:</p>
+                    <p class="bg-slate-900 p-2 rounded text-emerald-400">Q_sub = m_water · ΔH_sublimation</p>
+                    <p>With ΔH_sublimation ≈ 2.83 MJ/kg. Extracting 100 kg H2O per day requires:</p>
+                    <p class="bg-slate-900 p-2 rounded text-cyan-200">P_thermal = (100 kg · 2.83 MJ/kg) / 86400 s ≈ 3.28 kW continuous thermal input</p>
+                `
+            },
+            {
+                id: "logistics-pad",
+                code: "SEC-07",
+                title: "Logistics Pad & Plume Protection Berm",
+                category: "Site Operations & Safety",
+                constraints: ["isru", "radiation"],
+                icon: "🚜",
+                simRoute: "https://pieter-smets.github.io/Einstein-Moon-Base-Camp/#/logistics",
+                center: { x: 1200, y: 440 },
+                problem: "Rocket engine exhaust accelerates abrasive regolith dust particles at hypervelocity (>2.5 km/s), threatening optical sensors and solar panels 3 km away.",
+                solution: "Sintered launch pad positioned behind a 12m natural topographic ridge, reinforced by a 3D-printed regolith blast deflector berm.",
+                tradeoff: "Sintered Pad vs. Unprepared Surface Landing: Sintered pads eliminate 99.8% of dust ejecta, protecting solar arrays and extending mission lifespan by >10 years.",
+                metrics: [
+                    { label: "Berm Height", value: "12 Meters", color: "text-nasa-emerald" },
+                    { label: "Plume Velocity Reduction", value: "99.8%", color: "text-nasa-emerald" },
+                    { label: "Staging Area", value: "4,500 m²", color: "text-slate-300" }
+                ],
+                subsystems: [
+                    { name: "3D Printed Regolith Blast Berm", ok: true },
+                    { name: "Automated Unloading Crane Rail", ok: true },
+                    { name: "Autonomous Dust Washing Enclosure", ok: true }
+                ],
+                calculationsHtml: `
+                    <p class="font-semibold text-cyan-300">Regolith Ejecta Velocity Equation (Lunar Vacuum):</p>
+                    <p class="bg-slate-900 p-2 rounded text-emerald-400">v_particle = √( (C_d · ρ_gas · v_gas²) / (2 · ρ_particle · d_p) )</p>
+                    <p>Engine exhaust gas at 3,100 m/s accelerates 100μm dust grains to ~2,200 m/s. A 12m protective berm intercepts trajectories up to 18° launch elevation angle.</p>
+                `
+            }
+        ];
+
+        // ==========================================
+        // 2. STATE MANAGEMENT & PAN/ZOOM ENGINE
+        // ==========================================
+        let state = {
+            scale: 1.0,
+            tx: 0,
+            ty: 0,
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            activeSectorId: null,
+            activeConstraint: 'all',
+            inspectMode: false,
+            tourActive: false,
+            tourIndex: 0
+        };
+
+        const mapViewport = document.getElementById('mapViewport');
+        const mapContainer = document.getElementById('mapTransformContainer');
+
+        function updateTransform(smooth = false) {
+            if (smooth) {
+                mapContainer.classList.add('transition-transform', 'duration-500', 'ease-out');
+            } else {
+                mapContainer.classList.remove('transition-transform', 'duration-500', 'ease-out');
+            }
+            mapContainer.style.transform = `translate(${state.tx}px, ${state.ty}px) scale(${state.scale})`;
+        }
+
+        function zoomToScale(newScale, focalX = mapViewport.clientWidth / 2, focalY = mapViewport.clientHeight / 2) {
+            const clampedScale = Math.min(Math.max(newScale, 0.7), 4.5);
+            if (clampedScale === state.scale) return;
+
+            const scaleRatio = clampedScale / state.scale;
+            state.tx = focalX - scaleRatio * (focalX - state.tx);
+            state.ty = focalY - scaleRatio * (focalY - state.ty);
+            state.scale = clampedScale;
+
+            updateTransform(false);
+        }
+
+        function focusSector(sectorId, openDrawer = true) {
+            const sector = SECTORS_DATA.find(s => s.id === sectorId);
+            if (!sector) return;
+
+            state.activeSectorId = sectorId;
+
+            // Highlight hotspot SVG elements
+            document.querySelectorAll('.map-hotspot').forEach(el => {
+                if (el.getAttribute('data-sector') === sectorId) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+
+            // Calculate precise camera center offset
+            const vw = mapViewport.clientWidth;
+            const vh = mapViewport.clientHeight;
+            const svgEl = document.getElementById('baseMapSvg');
+            const svgRect = svgEl.getBoundingClientRect();
+            
+            const targetScale = 2.2;
+            const targetX = (vw / 2) - (sector.center.x / 1600) * svgRect.width * targetScale;
+            const targetY = (vh / 2) - (sector.center.y / 900) * svgRect.height * targetScale;
+
+            state.scale = targetScale;
+            state.tx = targetX;
+            state.ty = targetY;
+
+            updateTransform(true);
+            if (openDrawer && !state.tourActive) {
+                renderDetailDrawer(sector);
+            }
+        }
+
+        function resetView() {
+            state.scale = 1.0;
+            state.tx = 0;
+            state.ty = 0;
+            state.activeSectorId = null;
+            document.querySelectorAll('.map-hotspot').forEach(el => el.classList.remove('active'));
+            updateTransform(true);
+            closeDetailDrawer();
+            if (state.tourActive) exitJuryTour();
+        }
+
+        // Mouse Drag & Wheel Panning
+        mapViewport.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            if (state.inspectMode) {
+                logDevCoordinates(e);
+                return;
+            }
+            state.isDragging = true;
+            state.startX = e.clientX - state.tx;
+            state.startY = e.clientY - state.ty;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!state.isDragging) return;
+            state.tx = e.clientX - state.startX;
+            state.ty = e.clientY - state.startY;
+            updateTransform(false);
+        });
+
+        window.addEventListener('mouseup', () => state.isDragging = false);
+
+        mapViewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.88 : 1.14;
+            const rect = mapViewport.getBoundingClientRect();
+            zoomToScale(state.scale * delta, e.clientX - rect.left, e.clientY - rect.top);
+        }, { passive: false });
+
+        document.getElementById('zoomInBtn').addEventListener('click', () => zoomToScale(state.scale * 1.25));
+        document.getElementById('zoomOutBtn').addEventListener('click', () => zoomToScale(state.scale * 0.8));
+        document.getElementById('resetViewBtn').addEventListener('click', resetView);
+
+        // ==========================================
+        // 3. HOVER HUD TOOLTIP & HOTSPOT CLICK
+        // ==========================================
+        const hudTooltip = document.getElementById('hudTooltip');
+
+        document.querySelectorAll('.map-hotspot').forEach(hotspot => {
+            const sectorId = hotspot.getAttribute('data-sector');
+            const sector = SECTORS_DATA.find(s => s.id === sectorId);
+
+            hotspot.addEventListener('mouseenter', () => {
+                if (!sector) return;
+                document.getElementById('tooltipCode').textContent = sector.code;
+                document.getElementById('tooltipCategory').textContent = sector.category;
+                document.getElementById('tooltipTitle').textContent = sector.title;
+                document.getElementById('tooltipStat').textContent = sector.metrics[0] 
+                    ? `${sector.metrics[0].label}: ${sector.metrics[0].value}` 
+                    : sector.category;
+
+                hudTooltip.classList.remove('hidden');
+            });
+
+            hotspot.addEventListener('mousemove', (e) => {
+                hudTooltip.style.left = `${e.clientX}px`;
+                hudTooltip.style.top = `${e.clientY - 12}px`;
+            });
+
+            hotspot.addEventListener('mouseleave', () => hudTooltip.classList.add('hidden'));
+
+            hotspot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (sector) focusSector(sector.id);
+            });
+        });
+
+        // ==========================================
+        // 4. DETAIL DRAWER (TECHNICAL SPECIFICATIONS)
+        // ==========================================
+        const detailDrawer = document.getElementById('detailDrawer');
+        let currentDrawerSector = null;
+
+        function renderDetailDrawer(sector) {
+            currentDrawerSector = sector;
+            document.getElementById('drawerCode').textContent = sector.code;
+            document.getElementById('drawerCategory').textContent = sector.category.toUpperCase();
+            document.getElementById('drawerTitle').textContent = sector.title;
+            document.getElementById('drawerIcon').textContent = sector.icon;
+            document.getElementById('drawerProblemText').textContent = sector.problem;
+            document.getElementById('drawerSolutionText').textContent = sector.solution;
+            document.getElementById('drawerTradeoffText').innerHTML = sector.tradeoff;
+            document.getElementById('drawerSimRoute').textContent = sector.simRoute;
+            document.getElementById('launchSimBtn').href = sector.simRoute;
+
+            // Render Metrics Grid
+            const metricsGrid = document.getElementById('drawerMetricsGrid');
+            metricsGrid.innerHTML = sector.metrics.map(m => `
+                <div class="rounded-lg border border-slate-800 bg-slate-900/80 p-3">
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">${m.label}</div>
+                    <div class="text-sm font-bold ${m.color}">${m.value}</div>
+                </div>
+            `).join('');
+
+            // Render Subsystems Checklist
+            const subsystemsList = document.getElementById('drawerSubsystemsList');
+            subsystemsList.innerHTML = sector.subsystems.map(sub => `
+                <div class="flex items-center justify-between rounded border border-slate-800/80 bg-slate-900/50 px-3 py-1.5">
+                    <span class="text-slate-300 font-sans">${sub.name}</span>
+                    <span class="text-[10px] font-bold text-nasa-emerald flex items-center">
+                        <span class="h-1.5 w-1.5 rounded-full bg-nasa-emerald mr-1.5"></span>
+                        VERIFIED
+                    </span>
+                </div>
+            `).join('');
+
+            detailDrawer.classList.remove('translate-x-full');
+        }
+
+        function closeDetailDrawer() {
+            detailDrawer.classList.add('translate-x-full');
+        }
+
+        document.getElementById('closeDrawerBtn').addEventListener('click', closeDetailDrawer);
+        document.getElementById('drawerBackToMapBtn').addEventListener('click', resetView);
+
+        // Calculations Modal
+        const calcsModal = document.getElementById('calcsModal');
+        document.getElementById('viewCalcsBtn').addEventListener('click', () => {
+            if (!currentDrawerSector) return;
+            document.getElementById('calcsModalTitle').textContent = `DESIGN CALCULATIONS: ${currentDrawerSector.title.toUpperCase()}`;
+            document.getElementById('calcsModalContent').innerHTML = currentDrawerSector.calculationsHtml;
+            calcsModal.classList.remove('hidden');
+        });
+        document.getElementById('closeCalcsModalBtn').addEventListener('click', () => calcsModal.classList.add('hidden'));
+        document.getElementById('closeCalcsModalBtn2').addEventListener('click', () => calcsModal.classList.add('hidden'));
+
+        // Engineering Brief Download Simulator
+        document.getElementById('downloadBriefBtn').addEventListener('click', () => {
+            if (!currentDrawerSector) return;
+            alert(`[PDF Brief Generator]\nGenerating official engineering brief for: ${currentDrawerSector.title}\nIncludes CAD schematics, material trade-off matrices, and simulation validation logs.`);
+        });
+
+        // ==========================================
+        // 5. ENVIRONMENTAL CONSTRAINT FILTER LENSES
+        // ==========================================
+        document.querySelectorAll('.constraint-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const constraint = btn.getAttribute('data-constraint');
+                state.activeConstraint = constraint;
+
+                // Update active button state
+                document.querySelectorAll('.constraint-btn').forEach(b => {
+                    b.classList.remove('active', 'border-cyan-500', 'bg-cyan-950/60', 'text-white');
+                    b.classList.add('border-slate-700', 'bg-slate-950', 'text-slate-300');
+                });
+                btn.classList.add('active', 'border-cyan-500', 'bg-cyan-950/60', 'text-white');
+
+                // Filter Map Hotspots
+                document.querySelectorAll('.map-hotspot').forEach(hotspot => {
+                    const sectorId = hotspot.getAttribute('data-sector');
+                    const sector = SECTORS_DATA.find(s => s.id === sectorId);
+
+                    if (constraint === 'all' || (sector && sector.constraints.includes(constraint))) {
+                        hotspot.classList.remove('dimmed');
+                    } else {
+                        hotspot.classList.add('dimmed');
+                    }
+                });
+            });
+        });
+
+        // ==========================================
+        // 6. JURY GUIDED TOUR MODE
+        // ==========================================
+        const tourHudBar = document.getElementById('tourHudBar');
+
+        function startJuryTour() {
+            state.tourActive = true;
+            state.tourIndex = 0;
+            tourHudBar.classList.remove('hidden');
+            closeDetailDrawer();
+            updateTourStep();
+        }
+
+        function updateTourStep() {
+            const sector = SECTORS_DATA[state.tourIndex];
+            if (!sector) return;
+
+            document.getElementById('tourStepIndicator').textContent = `STEP ${state.tourIndex + 1} OF ${SECTORS_DATA.length}`;
+            document.getElementById('tourSectorTitle').textContent = `${sector.code}: ${sector.title}`;
+            document.getElementById('tourProblemSummary').textContent = sector.problem;
+            document.getElementById('tourSimLink').href = sector.simRoute;
+
+            focusSector(sector.id, false);
+        }
+
+        function exitJuryTour() {
+            state.tourActive = false;
+            tourHudBar.classList.add('hidden');
+            resetView();
+        }
+
+        document.getElementById('startJuryTourBtn').addEventListener('click', startJuryTour);
+        document.getElementById('exitTourBtn').addEventListener('click', exitJuryTour);
+
+        document.getElementById('tourNextBtn').addEventListener('click', () => {
+            if (state.tourIndex < SECTORS_DATA.length - 1) {
+                state.tourIndex++;
+                updateTourStep();
+            } else {
+                exitJuryTour();
+            }
+        });
+
+        document.getElementById('tourPrevBtn').addEventListener('click', () => {
+            if (state.tourIndex > 0) {
+                state.tourIndex--;
+                updateTourStep();
+            }
+        });
+
+        // ==========================================
+        // 7. SIDEBAR DIRECTORY & SEARCH
+        // ==========================================
+        const sidebarList = document.getElementById('sidebarList');
+        const sectorSidebar = document.getElementById('sectorSidebar');
+
+        function renderSidebar() {
+            sidebarList.innerHTML = SECTORS_DATA.map(sec => `
+                <div data-id="${sec.id}" class="sidebar-item group flex cursor-pointer items-center justify-between rounded-lg border border-slate-800 bg-slate-900/60 p-2.5 transition hover:border-cyan-400 hover:bg-slate-800">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg">${sec.icon}</span>
+                        <div>
+                            <div class="flex items-center space-x-1.5">
+                                <span class="font-mono text-[10px] font-bold text-nasa-cyan">${sec.code}</span>
+                                <span class="font-mono text-xs font-bold text-white group-hover:text-nasa-cyan transition">${sec.title}</span>
+                            </div>
+                            <span class="font-mono text-[10px] text-slate-400">${sec.category}</span>
+                        </div>
+                    </div>
+                    <span class="font-mono text-[10px] text-slate-500 group-hover:text-nasa-cyan">→</span>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = item.getAttribute('data-id');
+                    focusSector(id);
+                });
+            });
+        }
+        renderSidebar();
+
+        document.getElementById('toggleSidebarBtn').addEventListener('click', () => sectorSidebar.classList.toggle('hidden'));
+        document.getElementById('closeSidebarBtn').addEventListener('click', () => sectorSidebar.classList.add('hidden'));
+
+        // Search Autocomplete
+        const searchInput = document.getElementById('searchInput');
+        const searchDropdown = document.getElementById('searchDropdown');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) {
+                searchDropdown.classList.add('hidden');
+                clearSearchBtn.classList.add('hidden');
+                return;
+            }
+            clearSearchBtn.classList.remove('hidden');
+
+            const matches = SECTORS_DATA.filter(s => 
+                s.title.toLowerCase().includes(query) || 
+                s.code.toLowerCase().includes(query) || 
+                s.category.toLowerCase().includes(query) ||
+                s.problem.toLowerCase().includes(query)
+            );
+
+            if (matches.length > 0) {
+                searchDropdown.innerHTML = matches.map(m => `
+                    <div data-id="${m.id}" class="search-match cursor-pointer px-3 py-2 hover:bg-cyan-950/80 hover:text-nasa-cyan flex items-center justify-between border-b border-slate-800/50 last:border-0">
+                        <div class="flex items-center space-x-2">
+                            <span>${m.icon}</span>
+                            <span class="font-bold">${m.title}</span>
+                        </div>
+                        <span class="text-[10px] text-nasa-cyan font-mono">${m.code}</span>
+                    </div>
+                `).join('');
+                searchDropdown.classList.remove('hidden');
+
+                document.querySelectorAll('.search-match').forEach(match => {
+                    match.addEventListener('click', () => {
+                        const id = match.getAttribute('data-id');
+                        focusSector(id);
+                        searchDropdown.classList.add('hidden');
+                    });
+                });
+            } else {
+                searchDropdown.innerHTML = `<div class="px-3 py-2 text-slate-500">No matching base systems found.</div>`;
+                searchDropdown.classList.remove('hidden');
+            }
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchDropdown.classList.add('hidden');
+            clearSearchBtn.classList.add('hidden');
+        });
+
+        // ==========================================
+        // 8. DEVELOPER MAP & COORDINATE TOOL
+        // ==========================================
+        const devToolModal = document.getElementById('devToolModal');
+        document.getElementById('openDevToolBtn').addEventListener('click', () => devToolModal.classList.remove('hidden'));
+        document.getElementById('closeDevToolBtn').addEventListener('click', () => devToolModal.classList.add('hidden'));
+        document.getElementById('closeDevToolBtn2').addEventListener('click', () => devToolModal.classList.add('hidden'));
+
+        document.getElementById('applyCustomImageBtn').addEventListener('click', () => {
+            const url = document.getElementById('customImageUrlInput').value.trim();
+            if (url) applyMapBackground(url);
+        });
+
+        document.getElementById('customFileUpload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => applyMapBackground(evt.target.result);
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function applyMapBackground(imageSource) {
+            let bgImageEl = document.getElementById('customBgSvgImage');
+            const svg = document.getElementById('baseMapSvg');
+
+            if (!bgImageEl) {
+                bgImageEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                bgImageEl.setAttribute('id', 'customBgSvgImage');
+                bgImageEl.setAttribute('width', '1600');
+                bgImageEl.setAttribute('height', '900');
+                bgImageEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+                svg.insertBefore(bgImageEl, svg.firstChild);
+            }
+            bgImageEl.setAttribute('href', imageSource);
+            devToolModal.classList.add('hidden');
+        }
+
+        const toggleDevInspectBtn = document.getElementById('toggleDevInspectBtn');
+        const inspectModeStatus = document.getElementById('inspectModeStatus');
+
+        toggleDevInspectBtn.addEventListener('click', () => {
+            state.inspectMode = !state.inspectMode;
+            inspectModeStatus.textContent = state.inspectMode ? 'ON (CLICK MAP)' : 'OFF';
+            toggleDevInspectBtn.className = state.inspectMode 
+                ? 'rounded border border-emerald-500 bg-emerald-950/60 px-2.5 py-1 text-nasa-emerald font-bold transition'
+                : 'rounded border border-amber-500/50 bg-amber-950/40 px-2.5 py-1 text-amber-300 transition';
+        });
+
+        function logDevCoordinates(e) {
+            const svg = document.getElementById('baseMapSvg');
+            const rect = svg.getBoundingClientRect();
+            
+            const relX = Math.round(((e.clientX - rect.left) / rect.width) * 1600);
+            const relY = Math.round(((e.clientY - rect.top) / rect.height) * 900);
+
+            document.getElementById('devCoordOutput').textContent = 
+                `CALIBRATED POINT -> SVG 1600x900 Coordinates: (X: ${relX}, Y: ${relY})`;
+        }
+
+        document.getElementById('copySectorJsonBtn').addEventListener('click', () => {
+            const jsonText = JSON.stringify(SECTORS_DATA, null, 2);
+            const textArea = document.createElement('textarea');
+            textArea.value = jsonText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const btn = document.getElementById('copySectorJsonBtn');
+            btn.textContent = "✓ COPIED JSON!";
+            setTimeout(() => btn.textContent = "📋 COPY SECTOR CONFIG JSON", 2000);
+        });
+
+    </script>
+</body>
+</html>
