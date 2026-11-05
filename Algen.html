@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Algen Bioreactor & Habitat Simulator</title>
+    <title>Algae Bioreactor & Habitat Simulator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -12,71 +12,69 @@
 
     <div class="container">
         <div class="nav-bar">
-            <a href="index.html" class="nav-back-btn">← Terug naar Dashboard</a>
+            <a href="index.html" class="nav-back-btn">← Back to Dashboard</a>
         </div>
         <header>
-            <h1>Algen Bioreactor Simulator</h1>
-            <p>Bereken de benodigde hoeveelheid algen en water om de habitat van zuurstof te voorzien.</p>
+            <h1>Algae Bioreactor Simulator</h1>
+            <p>Calculate the amount of algae and water required to provide the habitat with a stable oxygen supply.</p>
         </header>
 
         <div class="main-layout">
             <div>
-                <h2 class="section-title">Inputgegevens</h2>
+                <h2 class="section-title">Input Data</h2>
 
                 <div class="input-group">
-                    <label for="zuurstofverbruik">Zuurstofverbruik / persoon / dag (kg)</label>
-                    <input type="number" id="zuurstofverbruik" value="0.84" step="0.01" min="0">
+                    <label for="oxygenUse">Oxygen use / person / day (kg)</label>
+                    <input type="number" id="oxygenUse" value="0.84" step="0.01" min="0">
                 </div>
 
                 <div class="input-group">
-                    <label for="astronauten">Aantal astronauten</label>
-                    <input type="number" id="astronauten" value="4" step="1" min="0">
+                    <label for="astronautCount">Number of astronauts</label>
+                    <input type="number" id="astronautCount" value="4" step="1" min="0">
                 </div>
 
                 <div class="input-group">
-                    <label for="concentratie">Concentratie algen (kg/l)</label>
-                    <input type="number" id="concentratie" value="0.002" step="0.0001" min="0.00001">
+                    <label for="algaeConcentration">Algae concentration (kg/l)</label>
+                    <input type="number" id="algaeConcentration" value="0.002" step="0.0001" min="0.00001">
                 </div>
 
                 <div class="input-group">
-                    <label for="productie">Productie algen/dag (factor)</label>
-                    <input type="number" id="productie" value="1.5" step="0.1" min="0">
+                    <label for="productionRate">Daily algae production (factor)</label>
+                    <input type="number" id="productionRate" value="1.5" step="0.1" min="0">
                 </div>
 
-                <button class="launch-btn" id="launchBtn">Activeer Systemen</button>
+                <button class="launch-btn" id="launchBtn">Activate Systems</button>
             </div>
 
             <div class="output-card">
                 <div>
-                    <h2 class="section-title">Simulatie
-                        Resultaten</h2>
+                    <h2 class="section-title">Simulation Results</h2>
                     <div class="output-grid">
                         <div class="output-box">
-                            <div class="label">Zuurstofnood / dag</div>
-                            <div class="value"><span id="outZuurstofnood">0.00</span> <span
+                            <div class="label">Daily oxygen need</div>
+                            <div class="value"><span id="outOxygenNeed">0.00</span> <span
                                     class="small-muted">kg</span></div>
                         </div>
                         <div class="output-box">
-                            <div class="label">Massa algen</div>
-                            <div class="value"><span id="outMassaAlgen">0.00</span> <span
+                            <div class="label">Algae mass</div>
+                            <div class="value"><span id="outAlgaeMass">0.00</span> <span
                                     class="small-muted">kg</span></div>
                         </div>
                         <div class="output-box span-2">
-                            <div class="label">Benodigd volume water</div>
+                            <div class="label">Required water volume</div>
                             <div class="value"><span id="outVolumeWater">0.00</span> <span
-                                    class="small-muted">Liter</span></div>
+                                    class="small-muted">liters</span></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="note">
-                    <strong>Systeeminformatie:</strong> De bioreactor past zich automatisch aan op basis van de
-                    ingevoerde parameters om een stabiel levensbehoud te garanderen.
+                    <strong>System information:</strong> The bioreactor automatically adapts to the input parameters to maintain stable life support.
                 </div>
             </div>
 
             <div class="visualizer-container">
-                <div class="visualizer-title">Live Bioreactor & O₂ Stroming Status</div>
+                <div class="visualizer-title">Live Bioreactor & O₂ Flow Status</div>
                 <canvas id="bioreactorCanvas" width="800" height="350"></canvas>
             </div>
         </div>
@@ -92,27 +90,27 @@
     </div>
 
     <script>
-        // DOM Elementen koppelen
-        const inputZuurstof = document.getElementById('zuurstofverbruik');
-        const inputAstronauten = document.getElementById('astronauten');
-        const inputConcentratie = document.getElementById('concentratie');
-        const inputProductie = document.getElementById('productie');
+        // Connect DOM elements
+        const inputOxygen = document.getElementById('oxygenUse');
+        const inputAstronauts = document.getElementById('astronautCount');
+        const inputConcentration = document.getElementById('algaeConcentration');
+        const inputProduction = document.getElementById('productionRate');
         const launchBtn = document.getElementById('launchBtn');
 
-        const outZuurstofnood = document.getElementById('outZuurstofnood');
-        const outMassaAlgen = document.getElementById('outMassaAlgen');
+        const outOxygenNeed = document.getElementById('outOxygenNeed');
+        const outAlgaeMass = document.getElementById('outAlgaeMass');
         const outVolumeWater = document.getElementById('outVolumeWater');
 
         const canvas = document.getElementById('bioreactorCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Animatie variabelen
+        // Animation variables
         let systemActive = true;
         let bubbles = [];
         let oxygenParticles = [];
-        let dynamicWaterLevel = 0; // Groeit naar het juiste niveau toe
+        let dynamicWaterLevel = 0; // Rises toward the target level
 
-        // Bubbles generator voor in de bioreactor tank
+        // Bubbles generator for the bioreactor tank
         for (let i = 0; i < 30; i++) {
             bubbles.push({
                 x: 80 + Math.random() * 140,
@@ -122,53 +120,53 @@
             });
         }
 
-        // Berekeningen uitvoeren op basis van spreadsheet formules
+        // Calculate values based on spreadsheet formulas
         function calculate() {
-            const zuurstofPerPersoon = parseFloat(inputZuurstof.value) || 0;
-            const aantalAstronauten = parseFloat(inputAstronauten.value) || 0;
-            const concentratie = parseFloat(inputConcentratie.value) || 1;
-            const productieFactor = parseFloat(inputProductie.value) || 0;
+            const oxygenPerPerson = parseFloat(inputOxygen.value) || 0;
+            const astronautCount = parseFloat(inputAstronauts.value) || 0;
+            const concentration = parseFloat(inputConcentration.value) || 1;
+            const productionFactor = parseFloat(inputProduction.value) || 0;
 
-            // Formules:
-            // zuurstofnood/dag = aantal astronauten * zuurstofverbruik
-            const zuurstofnood = aantalAstronauten * zuurstofPerPersoon;
+            // Formula:
+            // daily oxygen demand = astronaut count * oxygen use per person
+            const oxygenNeed = astronautCount * oxygenPerPerson;
 
-            // massa algen = zuurstofnood * productie algen/dag factor
-            const massaAlgen = zuurstofnood * productieFactor;
+            // algae mass = oxygen need * daily algae production factor
+            const algaeMass = oxygenNeed * productionFactor;
 
-            // volume water = massa algen / concentratie algen
-            const volumeWater = concentratie > 0 ? (massaAlgen / concentratie) : 0;
+            // water volume = algae mass / algae concentration
+            const volumeWater = concentration > 0 ? (algaeMass / concentration) : 0;
 
-            // Updates naar het scherm schrijven (met nette decimalen)
-            outZuurstofnood.textContent = zuurstofnood.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            outMassaAlgen.textContent = massaAlgen.toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            outVolumeWater.textContent = volumeWater.toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            // Write updates to the screen using consistent decimal formatting
+            outOxygenNeed.textContent = oxygenNeed.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            outAlgaeMass.textContent = algaeMass.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            outVolumeWater.textContent = volumeWater.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-            return { volumeWater, aantalAstronauten };
+            return { volumeWater, astronautCount };
         }
 
-        // Klik-event voor de activatieknop
+        // Click event for the activation button
         launchBtn.addEventListener('click', () => {
             systemActive = !systemActive;
-            launchBtn.textContent = systemActive ? "Deactiveer Systemen" : "Activeer Systemen";
+            launchBtn.textContent = systemActive ? "Deactivate Systems" : "Activate Systems";
             launchBtn.style.backgroundColor = systemActive ? "var(--success)" : "var(--text-muted)";
         });
 
-        // Automatisch herberekenen bij input wijzigingen
-        [inputZuurstof, inputAstronauten, inputConcentratie, inputProductie].forEach(input => {
+        // Recalculate automatically when input changes
+        [inputOxygen, inputAstronauts, inputConcentration, inputProduction].forEach(input => {
             input.addEventListener('input', calculate);
         });
 
-        // Animatie Loop
+        // Animation loop
         function drawSimulation() {
             const data = calculate();
 
-            // Canvas opschonen
+            // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Doel-vloeistofhoogte bepalen op basis van het berekende water volume (geschaald)
+            // Determine target fluid height based on calculated water volume (scaled)
             const targetLevel = Math.min(220, (data.volumeWater / 5000) * 220);
-            dynamicWaterLevel += (targetLevel - dynamicWaterLevel) * 0.05; // Soepele transitie
+            dynamicWaterLevel += (targetLevel - dynamicWaterLevel) * 0.05; // Smooth transition
 
             // --- 1. TEKEN DE BIOREACTOR TANK (LINKS) ---
             const tankX = 70;

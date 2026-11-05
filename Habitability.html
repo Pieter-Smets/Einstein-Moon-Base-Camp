@@ -1,62 +1,234 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Lunar Settlement Suitability GIS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habitability Assessment</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body.habitability {
+            background: #0b0c10;
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: block;
+        }
+
+        .habitability .page-shell {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #1f2833;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 15px 40px rgba(15, 23, 42, 0.3);
+        }
+
+        .habitability .dashboard-layout {
+            display: grid;
+            grid-template-columns: 320px minmax(0, 1fr);
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .habitability .sidebar,
+        .habitability .map-view {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .habitability h2,
+        .habitability h3 {
+            color: #f8fafc;
+            margin-bottom: 0.9rem;
+        }
+
+        .habitability p,
+        .habitability label {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .habitability .sidebar p {
+            margin-bottom: 1rem;
+        }
+
+        .habitability label {
+            display: block;
+            margin: 0.85rem 0 0.4rem;
+            font-weight: 600;
+        }
+
+        .habitability input[type="number"],
+        .habitability input[type="text"],
+        .habitability input[type="range"] {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .habitability .divider {
+            border: none;
+            border-top: 1px solid #334155;
+            margin: 1.25rem 0;
+        }
+
+        .habitability .action-btn,
+        .habitability .toggle-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .habitability .action-btn {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            margin-top: 1rem;
+        }
+
+        .habitability .action-btn:hover,
+        .habitability .toggle-btn:hover {
+            background: #059669;
+        }
+
+        .habitability .map-view {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .habitability .comm-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 999px;
+            padding: 0.65rem 0.9rem;
+            color: #e2e8f0;
+            width: fit-content;
+        }
+
+        .habitability .indicator-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            background: #94a3b8;
+        }
+
+        .habitability .status-good { background: #10b981; }
+        .habitability .status-warn { background: #f59e0b; }
+        .habitability .status-bad { background: #ef4444; }
+
+        .habitability #status-text {
+            color: #cbd5e1;
+            min-height: 24px;
+        }
+
+        .habitability #map-display {
+            display: block;
+            width: 100%;
+            max-height: 620px;
+            object-fit: contain;
+            background: #0b0c10;
+            border-radius: 10px;
+            border: 1px solid #334155;
+        }
+
+        .habitability #toggle-bar {
+            display: inline-flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .habitability .toggle-btn {
+            padding: 0.7rem 1rem;
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+
+        .habitability .toggle-btn.active {
+            background: #38bdf8;
+            color: #082f49;
+            border-color: #38bdf8;
+        }
+
+        .habitability .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 900px) {
+            .habitability .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body class="habitability">
-
-    <div class="sidebar">
-        <h2>Mission Planning</h2>
-        <p>Target Center Coordinates:</p>
-        <label>Latitude (-90 to 90):</label>
-        <input type="number" id="lat" value="-0.6" step="0.1">
-
-        <label>Longitude (-180 to 180):</label>
-        <input type="number" id="lon" value="23.4" step="0.1">
-
-        <label>Scan Scale Width (km):</label>
-        <input type="number" id="scale" value="150">
-
-    <hr class="divider">
-
-        <h3>Topographic Weights</h3>
-        <label>Flat Terrain Weight (Landing Safety):</label>
-        <input type="range" id="w_flat" min="0" max="1" step="0.1" value="0.5">
-
-        <label>High Elevation Weight (Solar Exposure):</label>
-        <input type="range" id="w_elev" min="0" max="1" step="0.1" value="0.5">
-
-        <button class="action-btn" onclick="generateHeatmap()">Scan Surface Terrain</button>
-    </div>
-
-    <div class="map-view">
-        <div class="comm-badge" id="comm-badge">
-            <span class="indicator-dot" id="comm-dot"></span>
-            Earth Link: <span id="comm-text" class="comm-text">Checking...</span>
+    <div class="page-shell">
+        <div class="nav-bar">
+            <a href="index.html" class="nav-back-btn">← Back to Dashboard</a>
         </div>
 
-        <p id="status-text">Adjust baseline criteria weights and select "Scan Surface Terrain" to begin raster
-            calculations.</p>
-    <img id="map-display" src="" class="hidden">
+        <div class="dashboard-layout">
+            <aside class="sidebar">
+                <h2>Mission Planning</h2>
+                <p>Target center coordinates:</p>
+                <label for="lat">Latitude (-90 to 90):</label>
+                <input type="number" id="lat" value="-0.6" step="0.1">
 
-        <div class="toggle-container" id="toggle-bar">
-            <button class="toggle-btn active" id="btn-heatmap" onclick="switchView('heatmap')">Suitability
-                Heatmap</button>
-            <button class="toggle-btn" id="btn-original" onclick="switchView('original')">Original Elevation
-                Map</button>
+                <label for="lon">Longitude (-180 to 180):</label>
+                <input type="number" id="lon" value="23.4" step="0.1">
+
+                <label for="scale">Scan scale width (km):</label>
+                <input type="number" id="scale" value="150">
+
+                <hr class="divider">
+
+                <h3>Topographic Weights</h3>
+                <label for="w_flat">Flat terrain weight (landing safety):</label>
+                <input type="range" id="w_flat" min="0" max="1" step="0.1" value="0.5">
+
+                <label for="w_elev">High elevation weight (solar exposure):</label>
+                <input type="range" id="w_elev" min="0" max="1" step="0.1" value="0.5">
+
+                <button class="action-btn" onclick="generateHeatmap()">Scan Surface Terrain</button>
+            </aside>
+
+            <main class="map-view">
+                <div class="comm-badge" id="comm-badge">
+                    <span class="indicator-dot" id="comm-dot"></span>
+                    <span>Earth Link:</span>
+                    <span id="comm-text" class="comm-text">Checking...</span>
+                </div>
+
+                <p id="status-text">Adjust baseline criteria weights and select “Scan Surface Terrain” to begin raster calculations.</p>
+                <img id="map-display" src="" class="hidden" alt="Terrain suitability map">
+
+                <div class="toggle-container" id="toggle-bar">
+                    <button class="toggle-btn active" id="btn-heatmap" onclick="switchView('heatmap')">Suitability Heatmap</button>
+                    <button class="toggle-btn" id="btn-original" onclick="switchView('original')">Original Elevation Map</button>
+                </div>
+
+                <footer class="site-footer">
+                    <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a>
+                    © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under
+                    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+                    <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="CC license icon">
+                    <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="Attribution icon">
+                    <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="Non-commercial icon">
+                    <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt="Share alike icon">
+                </footer>
+            </main>
         </div>
-        <footer class="site-footer">
-            <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a>
-            © 2026 by <a href="https://example.com">Einstein Atheneum</a> is licensed under
-            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
-            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="">
-            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="">
-            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="">
-            <img class="cc-icon" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt="">
-        </footer>
     </div>
 
     <script>
@@ -92,14 +264,13 @@
                     memoryImages.heatmap = data.heatmap;
 
                     statusText.style.display = 'none';
-                    toggleBar.style.display = 'inline-block';
+                    toggleBar.style.display = 'inline-flex';
 
-                    // Update the Telemetry Badge Display
                     const commDot = document.getElementById('comm-dot');
                     const commText = document.getElementById('comm-text');
 
                     commText.innerText = `${data.comm_status} (${data.comm_percent}%)`;
-                    commDot.className = "indicator-dot"; // reset classes
+                    commDot.className = "indicator-dot";
 
                     if (data.comm_percent > 75) {
                         commDot.classList.add('status-good');
