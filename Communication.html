@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunar Communication: LoS & Interference</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .input-group label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Slider styling */
+        input[type=range] {
+            width: 100%;
+            margin: 10px 0;
+            appearance: none;
+            background: transparent;
+        }
+        
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: var(--border);
+            border-radius: 3px;
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            appearance: none;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        canvas {
+            width: 100%;
+            max-width: 800px;
+            height: 350px;
+            background-color: transparent;
+            display: block;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-bar">
+            <a href="index.html" class="nav-back-btn">← Back to Dashboard</a>
+        </div>
+
+    <div class="container" style="max-width: 1100px;">
+        <header style="text-align: center; margin-bottom: 2rem;">
+            <h1>Lunar Comms Simulator</h1>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;">Line-of-Sight & Regolith Interference (Moon Radius: 1738 km)</p>
+        </header>
+        
+        <div class="grid-layout">
+            <div>
+                <h2 class="section-title">Antenna & Rover Parameters</h2>
+                
+                <div class="input-group">
+                    <label for="heightRange">
+                        <span>Antenna Mast Height</span>
+                        <span id="heightVal">29 m</span>
+                    </label>
+                    <input type="range" id="heightRange" min="0" max="50" step="1" value="29">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                        A lower antenna increases the risk of signal blockage by the horizon and surface interference.
+                    </p>
+                </div>
+                
+                <div class="input-group">
+                    <label for="distanceRange">
+                        <span>Distance to Rover</span>
+                        <span id="distVal">10 km</span>
+                    </label>
+                    <input type="range" id="distanceRange" min="0" max="20" step="0.5" value="10">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                        Due to the Moon's strong curvature, the horizon is much closer than on Earth.
+                    </p>
+                </div>
+            </div>
+            
+            <div>
+                <h2 class="section-title">Signal Analysis</h2>
+                <div class="output-grid">
+                    <div class="output-box">
+                        <div class="label">Maximum LoS (Horizon)</div>
+                        <div class="value"><span id="outHorizon">0.0</span> <span style="font-size: 0.8rem; color: var(--text-muted);">km</span></div>
+                    </div>
+                    <div class="output-box">
+                        <div class="label">Reception Quality</div>
+                        <div id="outStatus" class="status-badge" style="background: var(--success); color: #fff;">Optimal</div>
+                    </div>
+                    <div class="output-box" style="grid-column: 1 / -1;">
+                        <div class="label">Physical Effect (Regolith ε = 3.0)</div>
+                        <div id="outDescription" style="font-size: 0.95rem; margin-top: 0.5rem; line-height: 1.4;">
+                            Signal is clear. There is a direct line-of-sight and the mast is high enough to avoid ground reflections.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualizer-container" style="margin-top: 2rem;">
+            <div class="visualizer-title" style="margin-bottom: 1rem; font-weight: bold;">Topographic Transmission View</div>
+            <canvas id="losCanvas" width="800" height="300"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elementen
+        const heightRange = document.getElementById('heightRange');
+        const distanceRange = document.getElementById('distanceRange');
+        const heightVal = document.getElementById('heightVal');
+        const distVal = document.getElementById('distVal');
+        
+        const outHorizon = document.getElementById('outHorizon');
+        const outStatus = document.getElementById('outStatus');
+        const outDescription = document.getElementById('outDescription');
+
+        const canvas = document.getElementById('losCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Constants
+        const R_MOON = 1738000; // Moon radius in meters
+        let animationOffset = 0; // For animating the signal
+
+        // Scale factors for visualization
+        const startX = 80;
+        const scaleX = 30; // 1 km = 30 pixels
+        const scaleY = 3.5;  // 1 m = 3.5 pixels
+        const baseY = 200; // Base height on the canvas
+
+        function calculateSystem() {
+            const h = parseFloat(heightRange.value); // meters
+            const d_km = parseFloat(distanceRange.value); // kilometers
+            
+            // Update labels
+            heightVal.textContent = h + " m";
+            distVal.textContent = d_km.toFixed(1) + " km";
+
+            // Formula: Horizon distance = √(2 * R * h)
+            const horizon_m = Math.sqrt(2 * R_MOON * h);
+            const horizon_km = horizon_m / 1000;
+
+            outHorizon.textContent = horizon_km.toFixed(2);
+
+            let status = "Optimal";
+            let statusColor = "var(--success)";
+            let desc = "Signal is clear. There is a direct line-of-sight and the mast is high enough.";
+            let signalState = 1; // 1=Good, 2=Fading, 0=Lost
+
+            if (d_km > horizon_km) {
+                // Beyond the horizon
+                status = "Broken (No LoS)";
+                statusColor = "#ef4444"; // Red
+                desc = "The rover is behind the Moon's horizon curve. The signal is physically blocked by the curvature (line-of-sight broken).";
+                signalState = 0;
+            } else if (h < 10) {
+                // Multipath fading caused by lunar dust (regolith)
+                status = "Weak (Interference)";
+                statusColor = "#eab308"; // Yellow/Orange
+                desc = "Multipath fading warning! The antenna is too low (< 10 m). Radio waves reflect off the regolith (dielectric constant ε = 3.0) and create destructive interference.";
+                signalState = 2;
+            }
+
+            outStatus.textContent = status;
+            outStatus.style.background = statusColor;
+            outDescription.textContent = desc;
+
+            return { h, d_km, horizon_km, signalState };
+        }
+
+        // Animation & render loop
+        function draw() {
+            const data = calculateSystem();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // --- 1. DRAW MOON SURFACE (CURVATURE) ---
+            ctx.beginPath();
+            ctx.moveTo(0, baseY);
+            
+            // Calculate the curvature drop per pixel width
+            for(let x = 0; x <= canvas.width; x++) {
+                let dist_from_mast_km = (x - startX) / scaleX;
+                let drop_y = 0;
+                
+                if (dist_from_mast_km > 0) {
+                    let dist_m = dist_from_mast_km * 1000;
+                    let drop_m = (dist_m * dist_m) / (2 * R_MOON);
+                    drop_y = drop_m * scaleY;
+                }
+                
+                ctx.lineTo(x, baseY + drop_y);
+            }
+            
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(0, canvas.height);
+            ctx.closePath();
+            
+            // Lunar ground styling
+            const gradient = ctx.createLinearGradient(0, baseY, 0, canvas.height);
+            gradient.addColorStop(0, "#334155");
+            gradient.addColorStop(1, "#0f172a");
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#475569";
+            ctx.stroke();
+
+            // --- 2. DRAW ANTENNA MAST ---
+            const mastTopY = baseY - (data.h * scaleY);
+            
+            ctx.beginPath();
+            ctx.moveTo(startX, baseY);
+            ctx.lineTo(startX, mastTopY);
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = "#94a3b8";
+            ctx.stroke();
+            
+            // Antenna transmitter node
+            ctx.beginPath();
+            ctx.arc(startX, mastTopY, 6, 0, Math.PI * 2);
+            ctx.fillStyle = "#38bdf8";
+            ctx.fill();
+
+            // --- 3. DRAW ROVER ---
+            const roverX = startX + (data.d_km * scaleX);
+            const roverDistM = data.d_km * 1000;
+            const roverDropM = (roverDistM * roverDistM) / (2 * R_MOON);
+            const roverBaseY = baseY + (roverDropM * scaleY);
+            const roverTopY = roverBaseY - (2 * scaleY);
+            
+            // Rover body
+            ctx.fillStyle = "#cbd5e1";
+            ctx.fillRect(roverX - 10, roverBaseY - 12, 20, 12);
+            // Rover wheels
+            ctx.beginPath();
+            ctx.arc(roverX - 6, roverBaseY, 4, 0, Math.PI * 2);
+            ctx.arc(roverX + 6, roverBaseY, 4, 0, Math.PI * 2);
+            ctx.fillStyle = "#1e293b";
+            ctx.fill();
+            // Rover antenna
+            ctx.beginPath();
+            ctx.moveTo(roverX, roverBaseY - 12);
+            ctx.lineTo(roverX, roverTopY);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#f8fafc";
+            ctx.stroke();
+
+            // --- 4. DRAW SIGNAL & INTERFERENCE ---
+            animationOffset -= 1;
+            
+            if (data.signalState === 0) {
+                // NO LoS: red blocked signal hitting the Moon
+                ctx.beginPath();
+                ctx.moveTo(startX, mastTopY);
+                ctx.lineTo(roverX, roverTopY);
+                ctx.strokeStyle = "#ef4444";
+                ctx.lineWidth = 3;
+                ctx.setLineDash([10, 5]);
+                ctx.lineDashOffset = animationOffset;
+                ctx.stroke();
+                
+                // Red X where the horizon intersects
+                let horizonX = startX + (data.horizon_km * scaleX);
+                let horizonDropM = (data.horizon_km * 1000) * (data.horizon_km * 1000) / (2 * R_MOON);
+                let horizonY = baseY + (horizonDropM * scaleY);
+                
+                ctx.setLineDash([]);
+                ctx.beginPath();
+                ctx.moveTo(horizonX - 8, horizonY - 8);
+                ctx.lineTo(horizonX + 8, horizonY + 8);
+                ctx.moveTo(horizonX + 8, horizonY - 8);
+                ctx.lineTo(horizonX - 8, horizonY + 8);
+                ctx.strokeStyle = "#ef4444";
+                ctx.lineWidth = 4;
+                ctx.stroke();
+
+            } else {
+                // LoS IS PRESENT
+                
+                // Main signal
+                ctx.beginPath();
+                ctx.moveTo(startX, mastTopY);
+                ctx.lineTo(roverX, roverTopY);
+                ctx.strokeStyle = data.signalState === 1 ? "#10b981" : "#eab308";
+                ctx.lineWidth = data.signalState === 1 ? 4 : 2;
+                ctx.setLineDash([15, 10]);
+                ctx.lineDashOffset = animationOffset;
+                ctx.stroke();
+
+                // If interference (height < 10): draw reflective multipath rays
+                if (data.signalState === 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(startX, mastTopY);
+                    
+                    const midKm = data.d_km / 2;
+                    const midX = startX + (midKm * scaleX);
+                    const midDistM = midKm * 1000;
+                    const midDropM = (midDistM * midDistM) / (2 * R_MOON);
+                    const midY = baseY + (midDropM * scaleY);
+
+                    ctx.lineTo(midX, midY);
+                    ctx.lineTo(roverX, roverTopY);
+                    
+                    ctx.strokeStyle = "rgba(234, 179, 8, 0.6)";
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    
+                    // Regolith bounce indicator
+                    ctx.setLineDash([]);
+                    ctx.beginPath();
+                    ctx.arc(midX, midY, 15, Math.PI, 2 * Math.PI);
+                    ctx.strokeStyle = "#eab308";
+                    ctx.stroke();
+                }
+            }
+
+            ctx.setLineDash([]);
+            requestAnimationFrame(draw);
+        }
+
+        // Slider events
+        heightRange.addEventListener('input', calculateSystem);
+        distanceRange.addEventListener('input', calculateSystem);
+
+        // Start application
+        calculateSystem();
+        draw();
+    </script>
+</body>
+</html>
