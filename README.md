@@ -1,389 +1,208 @@
 # Einstein Moon Base Camp 🌙
 
-A comprehensive interactive dashboard for lunar habitat simulation and analysis. This educational platform provides tools for understanding the physics, biology, and geography required for establishing a sustainable human presence on the Moon.
+Einstein Moon Base Camp is an interactive educational site for exploring how a lunar habitat might work. The project combines a mission-control dashboard with a set of simulation modules covering life support, transportation, artificial gravity, communications, base layout, terrain exploration, and settlement planning.
 
 **Live Demo:** [Einstein Moon Base Camp](https://pieter-smets.github.io/Einstein-Moon-Base-Camp/)
 
 ---
 
-## Table of Contents
+## Overview
 
-- [Overview](#overview)
-- [Features](#features)
-  - [Algen Bioreactor](#1-algen-bioreactor)
-  - [Catapult Trajectory Simulation](#2-catapult-trajectory-simulation)
-  - [Centrifuge Simulator](#3-centrifuge-simulator)
-  - [Lunar Map Explorer](#4-lunar-map-explorer)
-  - [Lunar Settlement Suitability (GIS)](#5-lunar-settlement-suitability-gis)
-- [Project Structure](#project-structure)
-- [Technology Stack](#technology-stack)
-- [Getting Started](#getting-started)
-- [Installation & Setup](#installation--setup)
-- [Usage](#usage)
-- [File Descriptions](#file-descriptions)
-- [License](#license)
+This project is designed as a lightweight browser-based learning environment for students and hobbyists. It brings together multiple Moon-colony concepts into one dashboard so users can test assumptions, compare engineering options, and explore the challenges of living and operating on the lunar surface.
+
+The main themes covered are:
+
+- Life support and oxygen generation
+- Lunar launch and payload delivery
+- Artificial gravity via rotation
+- Communication line-of-sight and signal interference
+- Moonbase architecture and module planning
+- Terrain exploration using lunar map data
+- Habitat site suitability analysis
 
 ---
 
-## Overview
+## Mission Control Dashboard
 
-Einstein Moon Base Camp is an interactive educational platform designed to explore the multifaceted challenges of establishing a lunar habitat. Students and researchers can simulate critical systems including:
+The entry page is `index.html`, which acts as the control center for the project. It presents a set of module cards, each linking to a different simulator or exploration page.
 
-- **Life Support:** Oxygen generation through algae-based bioreactors
-- **Transportation:** Catapult-based payload delivery systems
-- **Artificial Gravity:** Centrifuge design for crew health maintenance
-- **Geography & Terrain:** Interactive lunar topography exploration
-- **Site Selection:** GIS-based analysis for optimal settlement locations
+Current dashboard modules include:
 
-The platform emphasizes hands-on learning through interactive simulations with real-world parameters and USGS lunar data.
+- `Algen.html` — Algae Bioreactor
+- `CatapultSimulation.html` — Catapult Trajectory
+- `centrifuge.html` — Centrifuge Simulator
+- `Communication.html` — Communication Simulator
+- `moonbase.html` — Moonbase Overview
+- `MoonMap.html` — Lunar Map Explorer
 
 ---
 
 ## Features
 
-### 1. **Algen Bioreactor** 🌿
-*Module: `Algen.html`*
+### 1. Algae Bioreactor 🌿
+**File:** `Algen.html`
 
-Calculate the oxygen production capacity required to sustain a lunar habitat crew.
+This module estimates how much algae and water are needed to support an astronaut crew with oxygen production. It includes adjustable inputs for oxygen demand, crew size, algal concentration, and productivity. The page calculates the required algae mass and water volume and visualizes the system as an animated bioreactor.
 
-**Functionality:**
-- Input parameters: crew size, oxygen consumption rate, algae concentration, and production factors
-- Real-time calculations of:
-  - Total daily oxygen demand per crew
-  - Required water volume for bioreactor
-  - Algae biomass needed
-  - Production efficiency metrics
-- Detailed output showing system feasibility and sustainability ratios
+Key concepts:
+- Photosynthetic oxygen production
+- Crew life-support needs
+- Resource sizing for lunar habitats
+- Dynamic simulation of a closed-loop system
 
-**Educational Goals:**
-- Understand biological life support systems
-- Explore photosynthetic oxygen production
-- Calculate resource requirements for human survival
-- Analyze bioreactor efficiency metrics
+### 2. Catapult Trajectory 🚀
+**File:** `CatapultSimulation.html`
 
-**Key Parameters:**
-- Oxygen consumption: ~0.84 kg/person/day (reference: average human consumption)
-- Algae concentration: adjustable (kg/liter)
-- Production factor: growth rate multiplier
+This simulation models a lunar payload launch under custom gravity and launch conditions. Users can set mass, initial velocity, gravity, and angle, then view calculated values such as kinetic energy, flight time, range, and other trajectory parameters.
 
----
+Key concepts:
+- Projectile motion
+- Lunar gravity effects
+- Energy and range calculations
+- Motion analysis for cargo delivery systems
 
-### 2. **Catapult Trajectory Simulation** 🚀
-*Module: `CatapultSimulation.html`*
+### 3. Centrifuge Simulator 🔄
+**File:** `centrifuge.html`
 
-Simulate ballistic trajectories for lunar payload delivery systems under variable gravity.
+This module calculates key values for a rotating habitat or centrifuge, including angular velocity, frequency, period, and speed. It is designed to help users understand how artificial gravity can be created through rotation.
 
-**Functionality:**
-- Input parameters: object mass, initial velocity, launch angle, gravity level
-- Real-time trajectory calculations including:
-  - Maximum height reached
-  - Total flight time
-  - Horizontal range
-  - Impact velocity
-  - Kinetic energy at launch and impact
-- Visual graph plotting trajectory path
-- Spreadsheet-style data export with trajectory points
+Key concepts:
+- Circular motion
+- Centripetal acceleration
+- Artificial gravity design
+- Rotation rate optimization
 
-**Educational Goals:**
-- Apply kinematics and projectile motion physics
-- Understand gravity effects on trajectories
-- Optimize launch parameters for cargo delivery
-- Explore energy conservation principles
+### 4. Communication Simulator 📡
+**File:** `Communication.html`
 
-**Key Parameters:**
-- Moon gravity: -1.62 m/s² (approximately 1/6th of Earth's)
-- Adjustable launch angles: 0-90°
-- Customizable initial velocities and object masses
+This page models lunar communication by showing how antenna height, rover distance, and terrain curvature affect line-of-sight. It includes a visual graph of the Moon surface with a mast, rover, and signal path, and displays whether the link is optimal, weak, or broken.
 
-**Physics Formulas Used:**
-- Horizontal position: $x(t) = v_0 \cos(\theta) \cdot t$
-- Vertical position: $y(t) = v_0 \sin(\theta) \cdot t + \frac{1}{2}g t^2$
-- Range: $R = \frac{v_0^2 \sin(2\theta)}{|g|}$
-- Maximum height: $h_{max} = \frac{(v_0 \sin(\theta))^2}{2|g|}$
+Key concepts:
+- Line-of-sight limits on the Moon
+- Horizon blockage by curvature
+- Regolith-related signal interference
+- Practical communications constraints for lunar missions
 
----
+### 5. Moonbase Overview 🏠
+**File:** `moonbase.html`
 
-### 3. **Centrifuge Simulator** 🔄
-*Module: `centrifuge.html`*
+This interactive page presents a conceptual Moonbase layout with selectable modules such as communication, energy, nutrition, living space, shielding, and underground systems. Each section includes a short explanation and supporting facts, making it useful as a design overview for the larger habitat concept.
 
-Design and analyze rotating centrifuges for generating artificial gravity.
+Key concepts:
+- Habitat zoning
+- Module-based base design
+- Systems integration
+- Human survival infrastructure on the Moon
 
-**Functionality:**
-- Input parameters: radius, desired gravity level, object mass
-- Real-time calculations of:
-  - Required angular velocity (rad/s and RPM)
-  - Rotation frequency and period
-  - Centripetal acceleration
-  - Centripetal force required
-  - Required tension/structural support
-- Interactive parameter adjustment
-- Real-time output updates
+### 6. Lunar Map Explorer 🌑
+**File:** `MoonMap.html`
 
-**Educational Goals:**
-- Understand circular motion physics
-- Explore artificial gravity generation
-- Analyze structural requirements for rotating habitats
-- Study centripetal force and acceleration
+This page uses Leaflet.js and USGS NASA WMS lunar map layers to visualize the Moon's terrain. It supports multiple base layers, zooming, panning, and coordinate navigation. It is intended for terrain inspection and mission planning.
 
-**Key Parameters:**
-- Radius: distance from rotation axis (meters)
-- Target gravity: desired acceleration (m/s²)
-- Mass: test object or crew member mass
+Key concepts:
+- Lunar topography
+- Elevation data interpretation
+- Map-based site review
+- Terrain awareness for settlement planning
 
-**Physics Formulas Used:**
-- Centripetal acceleration: $a_c = \omega^2 r = \frac{v^2}{r}$
-- Angular velocity: $\omega = \sqrt{\frac{a_c}{r}}$
-- Centripetal force: $F_c = m \omega^2 r$
-- Frequency: $f = \frac{\omega}{2\pi}$
-- Period: $T = \frac{1}{f} = \frac{2\pi}{\omega}$
+### 7. Settlement Suitability GIS 📍
+**File:** `Habitability.html`
 
----
+This page performs a simplified habitat suitability analysis by comparing terrain variables such as elevation and slope influence. It includes a heatmap view, a terrain map toggle, and a communication status badge. The interface allows users to explore how different terrain weights affect a candidate site.
 
-### 4. **Lunar Map Explorer** 🌑
-*Module: `MoonMap.html`*
-
-Interactive exploration of lunar topography using NASA LRO/LOLA elevation data.
-
-**Functionality:**
-- Interactive web-based map powered by Leaflet.js
-- USGS WMS integration for real-time lunar terrain data
-- Pan and zoom controls for detailed exploration
-- LOLA (Lunar Orbiter Laser Altimeter) elevation data visualization
-- High-resolution topographic color mapping
-
-**Data Source:**
-- **USGS Planetary Maps**: Official NASA/USGS lunar cartography
-- **LOLA Data**: Comprehensive lunar elevation mapping with meter-scale resolution
-- **WMS Service**: Web Map Service for dynamic tile generation
-
-**Educational Goals:**
-- Visualize lunar terrain and topography
-- Identify terrain features and geological formations
-- Explore potential settlement sites
-- Understand elevation variations across lunar surface
-
-**Technical Details:**
-- Map tiles generated via USGS WMS service
-- Leaflet.js for interactive mapping interface
-- Support for standard web mercator and lunar projections
-
----
-
-### 5. **Lunar Settlement Suitability (GIS)** 📍
-*Module: `Habitability.html`*
-
-Geographic Information System (GIS) analysis for optimal lunar settlement site selection.
-
-**Functionality:**
-- Interactive slider controls for filtering parameters:
-  - Elevation range
-  - Solar illumination percentage
-  - Temperature constraints
-  - Slope angle limitations
-  - Water ice proximity
-- Real-time map updates showing suitable locations
-- Color-coded suitability visualization
-- Location coordinate display
-- Parameter-based filtering for multi-criteria analysis
-
-**Educational Goals:**
-- Understand GIS and spatial analysis
-- Learn multi-criteria decision analysis
-- Identify optimal settlement locations based on constraints
-- Explore trade-offs between different environmental factors
-
-**Key Selection Criteria:**
-- **Elevation**: Affects atmospheric pressure, resource accessibility
-- **Solar Access**: Influences power generation (solar panels)
-- **Temperature**: Affects equipment operation and crew safety
-- **Slope**: Determines construction difficulty and stability
-- **Water Ice**: Critical resource for habitat sustainability
+Key concepts:
+- Terrain suitability analysis
+- Multi-factor mission planning
+- Habitat placement decisions
+- Environmental trade-offs
 
 ---
 
 ## Project Structure
 
+```text
+Einstein-Moon-Base-Camp/
+├── index.html                # Mission-control dashboard
+├── Algen.html                # Algae bioreactor simulator
+├── CatapultSimulation.html   # Payload launch and trajectory calculator
+├── centrifuge.html           # Artificial gravity simulator
+├── Communication.html        # Lunar communications line-of-sight simulator
+├── moonbase.html             # Moonbase design overview and module explorer
+├── MoonMap.html              # Lunar terrain map explorer
+├── Habitability.html         # Settlement suitability analysis page
+├── manifest.json             # PWA manifest
+├── sw.js                     # Service worker for installability
+├── style.css                # Shared styling for the site
+├── moonheightmap.py          # Optional Python helper for map-related work
+├── README.md                 # Project overview and instructions
+└── LICENSE                   # Project license if present in the repo
 ```
-Einstein Moon Base Camp/
-├── index.html                 # Main dashboard/landing page
-├── Algen.html                 # Algae bioreactor simulator
-├── CatapultSimulation.html    # Ballistic trajectory simulator
-├── centrifuge.html            # Centrifuge/artificial gravity simulator
-├── MoonMap.html               # Interactive lunar map viewer
-├── Habitability.html          # GIS-based site selection tool
-├── moonheightmap.py           # Flask backend for USGS map tiles
-├── style.css                  # Global CSS styling
-└── README.md                  # This file
-```
 
 ---
 
-## Technology Stack
+## How to Run
 
-### Frontend
-- **HTML5**: Semantic markup and structure
-- **CSS3**: Modern styling with CSS variables and media queries
-- **JavaScript**: Interactive simulations and calculations
-- **Leaflet.js**: Interactive mapping library (v1.9.4)
+### Option 1: Open directly in a browser
 
-### Backend (Optional)
-- **Flask**: Python microframework for WMS proxy service
-- **USGS WMS Service**: NASA lunar cartography data source
-- **Requests Library**: HTTP client for external API calls
-
-### Data Sources
-- **USGS Planetary Maps**: Official lunar elevation and imagery data
-- **LOLA (Lunar Orbiter Laser Altimeter)**: High-resolution elevation dataset
-- **NASA LRO (Lunar Reconnaissance Orbiter)**: Orbital imagery and measurements
-
-### Design & UX
-- **Responsive Design**: Mobile-first approach with media queries
-- **Accessibility**: Semantic HTML and keyboard navigation support
-- **CSS Custom Properties**: Theme-based color system for consistency
-- **Modern UI Patterns**: Cards, buttons, input groups, and layouts
-
----
-
-## Getting Started
-
-### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Internet connection (for WMS tile loading and external resources)
-- Optional: Python 3.6+ and Flask (for local WMS proxy)
-
-### Quick Start
-
-1. **Access Online:**
-   Simply visit the [live demo](https://pieter-smets.github.io/Einstein-Moon-Base-Camp/)
-
-2. **Local Setup:**
-   - Clone or download the repository
-   - Open `index.html` in your web browser
-   - Navigate through modules using the dashboard menu
-
----
-
-## Installation & Setup
-
-### Option 1: Static Hosting (Recommended)
+Clone or download the repository and open `index.html` in a modern browser.
 
 ```bash
-# Clone the repository
 git clone https://github.com/Pieter-Smets/Einstein-Moon-Base-Camp.git
 cd Einstein-Moon-Base-Camp
-
-# Open index.html in your browser
-# On Windows:
 start index.html
-
-# On macOS:
-open index.html
-
-# On Linux:
-xdg-open index.html
 ```
 
-### Option 2: Local Python Server (with WMS Proxy)
+### Option 2: Serve locally
+
+For a more reliable setup, serve the folder with a local web server:
 
 ```bash
-# Install dependencies
-pip install flask requests
-
-# Run the Flask server
-python moonheightmap.py
-
-# Server runs at http://localhost:5000
-# Access through a local HTTP server for the main site:
-# Python 3
+cd Einstein-Moon-Base-Camp
 python -m http.server 8000
-
-# Then visit http://localhost:8000 in your browser
 ```
 
-### Option 3: Docker
+Then open:
 
-```bash
-# Create a Dockerfile (if needed for deployment)
-# Build and run containerized version
-docker build -t moon-base-camp .
-docker run -p 8000:8000 moon-base-camp
+```text
+http://localhost:8000/
 ```
+
+> Some modules load external resources and map tiles from the internet, so an active network connection is recommended.
 
 ---
 
-## Usage
+## Technologies Used
 
-### Navigation
-
-1. **Start at Dashboard:** Open `index.html` to see the Mission Control Dashboard
-2. **Select Module:** Click any module card to launch that simulator
-3. **Configure Parameters:** Adjust input fields with your desired values
-4. **Run Simulation:** Click "Activeer Systemen" or "Launch" button
-5. **Review Results:** Check output cards for calculated metrics
-6. **Return Home:** Use "← Back to Dashboard" navigation link
-
-### Module Workflows
-
-#### Algen Bioreactor
-1. Set number of astronauts and oxygen consumption rate
-2. Adjust algae concentration and production factor
-3. Click "Activeer Systemen" to calculate
-4. Review water volume, algae mass, and efficiency metrics
-
-#### Catapult Simulation
-1. Input object mass and desired launch velocity
-2. Set gravity level (Moon: -1.62 m/s²)
-3. Choose launch angle (0-90°)
-4. Click "Launch Catapult" to simulate
-5. Review trajectory graph and data points
-6. Adjust parameters and re-run for optimization
-
-#### Centrifuge Simulator
-1. Input desired radius for rotation
-2. Set target gravity level
-3. Enter object mass
-4. View calculated angular velocity, frequency, and forces
-5. Adjust parameters to optimize for crew comfort
-
-#### Lunar Map Explorer
-1. Use map controls to pan and zoom
-2. Click/drag to explore different regions
-3. Identify terrain features and valleys
-4. Note coordinates for settlement suitability analysis
-
-#### Settlement Suitability
-1. Adjust slider controls for elevation range
-2. Set solar illumination requirements
-3. Configure temperature and slope constraints
-4. View color-coded suitability map
-5. Identify optimal settlement zones meeting all criteria
+- HTML5
+- CSS3
+- JavaScript
+- Leaflet.js
+- USGS / NASA lunar map services
+- Service worker support for light PWA behavior
 
 ---
 
-## File Descriptions
+## Educational Use
 
-### Core Files
+This project is intended for educational exploration rather than precise engineering validation. The calculators are simplified and designed to communicate the relationships between variables and mission design trade-offs. They are useful for demonstrating core ideas in space systems and lunar habitat design.
 
-| File | Purpose | Language |
-|------|---------|----------|
-| `index.html` | Landing page with module navigation | HTML |
-| `style.css` | Global styles and theming | CSS |
+---
 
-### Simulation Modules
+## License
 
-| Module | File | Focus | Language |
-|--------|------|-------|----------|
-| Bioreactor | `Algen.html` | Life support systems | HTML/JS |
-| Catapult | `CatapultSimulation.html` | Ballistics & trajectories | HTML/JS |
-| Centrifuge | `centrifuge.html` | Artificial gravity | HTML/JS |
-| Lunar Map | `MoonMap.html` | Topographic visualization | HTML/JS + Leaflet |
-| Habitability | `Habitability.html` | GIS site selection | HTML/JS |
+This project is published under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International license, as indicated in the site footer.
 
-### Backend Services
+For more information, see:
+https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-| File | Purpose | Language | Framework |
-|------|---------|----------|-----------|
-| `moonheightmap.py` | WMS proxy for lunar data | Python | Flask |
+---
+
+## Notes
+
+- The dashboard is the main entry point for the site.
+- Pages are designed as lightweight static web modules.
+- The project is best viewed in a modern browser with JavaScript enabled.
+- Map-based features depend on remote services and may vary based on network availability.
 
 ---
 
@@ -411,167 +230,22 @@ This platform addresses key educational concepts:
 
 ### Engineering
 - System design and optimization
-- Multi-criteria decision analysis (MCDA)
+- Multi-criteria decision analysis
 - Resource planning and allocation
-- Structural analysis (centrifuge design)
+- Structural analysis for rotating habitats
 
 ### Space Science
-- Lunar environment characteristics
+- Lunar environmental characteristics
 - NASA/USGS data utilization
-- Actual lunar conditions and parameters
-- Settlement planning methodology
+- Mission planning under real lunar constraints
+- Settlement layout and systems integration
 
 ---
 
-## Customization & Extension
+## Conclusion
 
-### Adding New Modules
+Einstein Moon Base Camp is a compact educational toolkit for thinking through the systems required to support human life on the Moon. It brings together scientific, engineering, and planning concepts in a form that is easy to explore interactively from a browser.
 
-1. Create new HTML file (e.g., `NewModule.html`)
-2. Link to `style.css` for consistent theming
-3. Add navigation button in `index.html`
-4. Include back-to-dashboard link in new module
-5. Implement calculations using JavaScript
-
-### Modifying Parameters
-
-All input values and calculations are in the HTML/JS files:
-- Search for `value="X"` to find default input values
-- Modify calculation formulas in JavaScript `<script>` sections
-- Update output labels and descriptions as needed
-
-### Styling
-
-Global CSS variables are defined in `style.css`:
-```css
-:root {
-    --primary: #2563eb;           /* Main color (blue) */
-    --success: #16a34a;           /* Success color (green) */
-    --background: #f8fafc;        /* Page background */
-    --card-bg: #ffffff;           /* Card background */
-    --text-main: #1e293b;         /* Main text color */
-    --text-muted: #64748b;        /* Muted text color */
-    --border: #e2e8f0;            /* Border color */
-}
-```
-
-Modify these values to change the entire site's color scheme.
-
----
-
-## Data Attribution
-
-### USGS Lunar Data
-- **Source:** USGS Planetary Maps (https://planetarymaps.usgs.gov/)
-- **Service:** Web Map Service (WMS)
-- **Dataset:** LOLA (Lunar Orbiter Laser Altimeter) elevation color mapping
-- **Resolution:** Meter-scale topographic accuracy
-- **License:** Public domain (U.S. Government)
-
-### Creative Commons License
-This project is licensed under the **CC BY-NC-SA 4.0** (Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International)
-
-**You are free to:**
-- ✅ Share — copy and redistribute the material
-- ✅ Adapt — remix, transform, and build upon the material
-
-**Under the following terms:**
-- 🔗 **Attribution** — Credit must be given to the original creators
-- 💼 **NonCommercial** — Material cannot be used for commercial purposes
-- 🔄 **ShareAlike** — Derivative works must use the same license
-
----
-
-## License
-
-```
-Einstein Moon Base Camp
-© 2026 by Einstein Atheneum
-Licensed under CC BY-NC-SA 4.0
-https://creativecommons.org/licenses/by-nc-sa/4.0/
-```
-
-**License Attribution:**
-- CC (Creative Commons) - https://creativecommons.org/
-- BY (Attribution Required)
-- NC (Non-Commercial Use Only)
-- SA (Share-Alike)
-
----
-
-## Contributing
-
-Contributions are welcome! To contribute:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-Please ensure:
-- Code follows existing style conventions
-- New features include proper documentation
-- All calculations are physically accurate
-- Responsive design is maintained
-
----
-
-## Troubleshooting
-
-### Lunar Map Not Loading
-- Check internet connection (WMS tiles require online access)
-- Verify USGS WMS service is accessible
-- Clear browser cache and refresh
-- Try alternative browser
-
-### Calculations Not Working
-- Check browser console for JavaScript errors (F12)
-- Ensure JavaScript is enabled
-- Try clearing browser cache
-- Verify input values are valid numbers
-
-### Performance Issues
-- Close unnecessary browser tabs
-- Clear browser cache
-- Try a different browser
-- Disable browser extensions
-
----
-
-## Support & Contact
-
-For questions, issues, or suggestions:
-- **GitHub:** [Pieter-Smets/Einstein-Moon-Base-Camp](https://github.com/Pieter-Smets/Einstein-Moon-Base-Camp)
-- **Institution:** Einstein Atheneum
-- **License:** See LICENSE file for full terms
-
----
-
-## Changelog
-
-### Version 1.0.0 (Current)
-- ✨ Initial release with 5 main modules
-- 🌙 Lunar Map Explorer with USGS WMS integration
-- 🚀 Catapult trajectory simulator with physics engine
-- 🔄 Centrifuge simulator for artificial gravity
-- 🌿 Algae bioreactor life support calculator
-- 📍 GIS-based settlement suitability analyzer
-- 🎨 Modern responsive UI with dark mode support
-- 📱 Mobile-friendly design
-- ♿ Accessibility features
-
----
-
-## Roadmap
-
-Planned features for future releases:
-- [ ] Water extraction and processing module
-- [ ] Power generation (solar/nuclear) calculator
-- [ ] Radiation shielding analysis
-- [ ] Thermal management simulator
-- [ ] 3D habitat visualization
-- [ ] Multiplayer collaborative simulations
 - [ ] Mobile native apps
 - [ ] Internationalization (i18n) support
 - [ ] Advanced data export (CSV, PDF)
