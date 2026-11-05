@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -13,7 +13,7 @@
 
     <div class="container">
         <div class="nav-bar">
-            <a href="index.html" class="nav-back-btn">← Terug naar Dashboard</a>
+            <a href="index.html" class="nav-back-btn">← Back to Dashboard</a>
         </div>
     <h1 class="page-title">Centrifuge Simulator</h1>
 
@@ -22,11 +22,11 @@
                 <div class="inputs-section">
                     <h3>Input</h3>
                     <div class="input-group">
-                        <label for="length">Lengte arm (m)</label>
+                        <label for="length">Arm length (m)</label>
                         <input type="number" id="length" value="10" step="0.1" min="0.1">
                     </div>
                     <div class="input-group">
-                        <label for="gravity">Target zwaartekracht (m/s²)</label>
+                        <label for="gravity">Target gravity (m/s²)</label>
                         <input type="number" id="gravity" value="9.81" step="0.01" min="0.01">
                     </div>
                 </div>
@@ -35,19 +35,19 @@
                     <h3>Output</h3>
                     <div class="output-grid">
                         <div class="output-box">
-                            <div class="label">Snelheid (m/s)</div>
+                            <div class="label">Speed (m/s)</div>
                             <div class="value" id="snelheid">0.00</div>
                         </div>
                         <div class="output-box">
-                            <div class="label">Hoeksnelheid (rad/s)</div>
+                            <div class="label">Angular velocity (rad/s)</div>
                             <div class="value" id="hoeksnelheid">0.00</div>
                         </div>
                         <div class="output-box">
-                            <div class="label">Frequentie (Hz)</div>
+                            <div class="label">Frequency (Hz)</div>
                             <div class="value" id="frequentie">0.00</div>
                         </div>
                         <div class="output-box">
-                            <div class="label">Periode (s)</div>
+                            <div class="label">Period (s)</div>
                             <div class="value" id="periode">0.00</div>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
             </div>
 
             <div class="visualizer-container">
-                <h3 class="visualizer-title">Live Animatie</h3>
+                <h3 class="visualizer-title">Live Animation</h3>
                 <canvas id="centrifugeCanvas" width="350" height="350"></canvas>
             </div>
         </div>
@@ -75,10 +75,10 @@
         const lengthInput = document.getElementById('length');
         const gravityInput = document.getElementById('gravity');
 
-        const snelheidEl = document.getElementById('snelheid');
-        const hoeksnelheidEl = document.getElementById('hoeksnelheid');
-        const frequentieEl = document.getElementById('frequentie');
-        const periodeEl = document.getElementById('periode');
+        const speedEl = document.getElementById('snelheid');
+        const angularVelocityEl = document.getElementById('hoeksnelheid');
+        const frequencyEl = document.getElementById('frequentie');
+        const periodEl = document.getElementById('periode');
 
         const canvas = document.getElementById('centrifugeCanvas');
         const ctx = canvas.getContext('2d');
@@ -95,32 +95,32 @@
 
             if (length > 0 && gravity > 0) {
                 // Spreadsheet formulas:
-                // Snelheid = WORTEL(B3*B2) -> sqrt(gravity * length)
-                const snelheid = Math.sqrt(gravity * length);
+                // Speed = SQRT(gravity * length)
+                const speed = Math.sqrt(gravity * length);
 
-                // Hoeksnelheid = B6/B2 -> snelheid / length
-                const hoeksnelheid = snelheid / length;
+                // Angular velocity = speed / length
+                const angularVelocityValue = speed / length;
 
-                // Frequentie = B7/(2*PI()) -> hoeksnelheid / (2 * PI)
-                const frequentie = hoeksnelheid / (2 * Math.PI);
+                // Frequency = angularVelocity / (2 * PI)
+                const frequency = angularVelocityValue / (2 * Math.PI);
 
-                // Periode = 1/B8 -> 1 / frequentie
-                const periode = 1 / frequentie;
+                // Period = 1 / frequency
+                const period = 1 / frequency;
 
                 // Update UI elements (to 2 decimal places)
-                snelheidEl.textContent = snelheid.toFixed(2);
-                hoeksnelheidEl.textContent = hoeksnelheid.toFixed(2);
-                frequentieEl.textContent = frequentie.toFixed(2);
-                periodeEl.textContent = periode.toFixed(2);
+                speedEl.textContent = speed.toFixed(2);
+                angularVelocityEl.textContent = angularVelocityValue.toFixed(2);
+                frequencyEl.textContent = frequency.toFixed(2);
+                periodEl.textContent = period.toFixed(2);
 
                 // Update animation speed
-                angularVelocity = hoeksnelheid;
+                angularVelocity = angularVelocityValue;
             } else {
                 // Reset to zeros if invalid
-                snelheidEl.textContent = "0.00";
-                hoeksnelheidEl.textContent = "0.00";
-                frequentieEl.textContent = "0.00";
-                periodeEl.textContent = "0.00";
+                speedEl.textContent = "0.00";
+                angularVelocityEl.textContent = "0.00";
+                frequencyEl.textContent = "0.00";
+                periodEl.textContent = "0.00";
                 angularVelocity = 0;
             }
         }
