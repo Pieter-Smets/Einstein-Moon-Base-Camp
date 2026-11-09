@@ -56,6 +56,13 @@
             margin-bottom: 1rem;
         }
 
+        .habitability .field-note {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            line-height: 1.45;
+            margin-top: 0.75rem;
+        }
+
         .habitability label {
             display: block;
             margin: 0.85rem 0 0.4rem;
@@ -95,6 +102,11 @@
         .habitability .action-btn:hover,
         .habitability .toggle-btn:hover {
             background: #059669;
+        }
+
+        .habitability .action-btn:disabled {
+            cursor: wait;
+            opacity: 0.7;
         }
 
         .habitability .map-view {
@@ -183,13 +195,13 @@
                 <h2>Mission Planning</h2>
                 <p>Target center coordinates:</p>
                 <label for="lat">Latitude (-90 to 90):</label>
-                <input type="number" id="lat" value="-0.6" step="0.1">
+                <input type="number" id="lat" value="-0.6" step="0.1" min="-90" max="90" required>
 
                 <label for="lon">Longitude (-180 to 180):</label>
-                <input type="number" id="lon" value="23.4" step="0.1">
+                <input type="number" id="lon" value="23.4" step="0.1" min="-180" max="180" required>
 
                 <label for="scale">Scan scale width (km):</label>
-                <input type="number" id="scale" value="150">
+                <input type="number" id="scale" value="150" min="1" step="any" required>
 
                 <hr class="divider">
 
@@ -200,23 +212,26 @@
                 <label for="w_elev">High elevation weight (solar exposure):</label>
                 <input type="range" id="w_elev" min="0" max="1" step="0.1" value="0.5">
 
-                <button class="action-btn" onclick="generateHeatmap()">Scan Surface Terrain</button>
+                <button class="action-btn" id="scanButton" type="button">Scan Surface Terrain</button>
+                <p class="field-note">Weights are normalized automatically. If both are zero, they are treated equally.</p>
+                <p class="field-note">This educational score uses image brightness as an elevation proxy and is not an engineering site assessment.</p>
             </aside>
 
             <main class="map-view">
-                <div class="comm-badge" id="comm-badge">
+                <div class="comm-badge hidden" id="comm-badge">
                     <span class="indicator-dot" id="comm-dot"></span>
                     <span>Earth Link:</span>
                     <span id="comm-text" class="comm-text">Checking...</span>
                 </div>
 
-                <p id="status-text">Adjust baseline criteria weights and select “Scan Surface Terrain” to begin raster calculations.</p>
+                <p id="status-text" role="status" aria-live="polite">Adjust baseline criteria weights and select “Scan Surface Terrain” to begin raster calculations.</p>
                 <img id="map-display" src="" class="hidden" alt="Terrain suitability map">
 
-                <div class="toggle-container" id="toggle-bar">
-                    <button class="toggle-btn active" id="btn-heatmap" onclick="switchView('heatmap')">Suitability Heatmap</button>
-                    <button class="toggle-btn" id="btn-original" onclick="switchView('original')">Original Elevation Map</button>
+                <div class="toggle-container hidden" id="toggle-bar">
+                    <button class="toggle-btn active" id="btn-heatmap" type="button">Suitability Heatmap</button>
+                    <button class="toggle-btn" id="btn-original" type="button">Original Elevation Map</button>
                 </div>
+                <p class="field-note">Earth-link status is a simple longitude-based proxy, not a terrain or antenna visibility calculation.</p>
 
                 <footer class="site-footer">
                     <a href="https://pieter-smets.github.io/Einstein-Moon-Base-Camp/">Einstein Moon Base Camp</a>
@@ -232,79 +247,237 @@
     </div>
 
     <script>
+        const GRID_SIZE = 600;
+        const colorStops = [
+            [165, 0, 38], [215, 48, 39], [244, 109, 67], [253, 174, 97],
+            [254, 224, 139], [255, 255, 191], [217, 239, 139], [166, 217, 106],
+            [102, 189, 99], [26, 152, 80], [0, 104, 55]
+        ];
         let memoryImages = { original: '', heatmap: '' };
+        const scanButton = document.getElementById('scanButton');
+        const imgDisplay = document.getElementById('map-display');
+        const statusText = document.getElementById('status-text');
+        const toggleBar = document.getElementById('toggle-bar');
+        const commBadge = document.getElementById('comm-badge');
 
-        function generateHeatmap() {
-            const lat = document.getElementById('lat').value;
-            const lon = document.getElementById('lon').value;
-            const scale = document.getElementById('scale').value;
-            const w_flat = document.getElementById('w_flat').value;
-            const w_elev = document.getElementById('w_elev').value;
+        function getValidatedInputs() {
+            const latInput = document.getElementById('lat');
+            const lonInput = document.getElementById('lon');
+            const scaleInput = document.getElementById('scale');
+            const lat = latInput.valueAsNumber;
+            const lon = lonInput.valueAsNumber;
+            const scale = scaleInput.valueAsNumber;
 
-            const imgDisplay = document.getElementById('map-display');
-            const statusText = document.getElementById('status-text');
-            const toggleBar = document.getElementById('toggle-bar');
-            const commBadge = document.getElementById('comm-badge');
+            for (const input of [latInput, lonInput, scaleInput]) {
+                if (!input.reportValidity()) {
+                    throw new Error('Please correct the highlighted input.');
+                }
+            }
 
-            imgDisplay.style.display = 'none';
-            toggleBar.style.display = 'none';
-            commBadge.style.display = 'none';
-            statusText.style.display = 'block';
-            statusText.innerText = "Processing topographic spatial matrices... Please wait.";
+            const degSpan = scale / 30.32;
+            if (lat - degSpan / 2 < -90 || lat + degSpan / 2 > 90) {
+                throw new Error('The selected scan area extends beyond the lunar poles. Reduce the scan width or move the center latitude.');
+            }
 
-            const apiUrl = `/calculate-settlement?lat=${lat}&lon=${lon}&scale=${scale}&w_flat=${w_flat}&w_elev=${w_elev}`;
+            const flatWeight = Number(document.getElementById('w_flat').value);
+            const elevationWeight = Number(document.getElementById('w_elev').value);
+            const totalWeight = flatWeight + elevationWeight;
 
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) return response.json().then(err => { throw new Error(err.error || "Server error"); });
-                    return response.json();
-                })
-                .then(data => {
-                    memoryImages.original = data.original;
-                    memoryImages.heatmap = data.heatmap;
+            return {
+                lat,
+                lon,
+                scale,
+                degSpan,
+                flatWeight: totalWeight > 0 ? flatWeight / totalWeight : 0.5,
+                elevationWeight: totalWeight > 0 ? elevationWeight / totalWeight : 0.5
+            };
+        }
 
-                    statusText.style.display = 'none';
-                    toggleBar.style.display = 'inline-flex';
+        async function fetchElevationImage({ lat, lon, scale }) {
+            const degSpan = scale / 30.32;
+            const minLon = ((lon % 360) + 360) % 360 - degSpan / 2;
+            const maxLon = minLon + degSpan;
+            const minLat = lat - degSpan / 2;
+            const maxLat = lat + degSpan / 2;
+            const url = new URL('https://planetarymaps.usgs.gov/cgi-bin/mapserv');
+            url.search = new URLSearchParams({
+                map: '/maps/earth/moon_simp_cyl.map',
+                service: 'WMS',
+                request: 'GetMap',
+                version: '1.1.1',
+                layers: 'LOLA_steel',
+                styles: '',
+                srs: 'EPSG:4326',
+                bbox: `${minLon},${minLat},${maxLon},${maxLat}`,
+                width: String(GRID_SIZE),
+                height: String(GRID_SIZE),
+                format: 'image/png'
+            });
 
-                    const commDot = document.getElementById('comm-dot');
-                    const commText = document.getElementById('comm-text');
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`USGS map service returned HTTP ${response.status}.`);
+            }
+            if (!response.headers.get('content-type')?.includes('image/')) {
+                throw new Error('USGS did not return a map image. Check the coordinates and try again.');
+            }
 
-                    commText.innerText = `${data.comm_status} (${data.comm_percent}%)`;
-                    commDot.className = "indicator-dot";
+            const image = await createImageBitmap(await response.blob());
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = GRID_SIZE;
+                canvas.height = GRID_SIZE;
+                const context = canvas.getContext('2d', { willReadFrequently: true });
+                context.drawImage(image, 0, 0, GRID_SIZE, GRID_SIZE);
+                return context.getImageData(0, 0, GRID_SIZE, GRID_SIZE);
+            } finally {
+                image.close();
+            }
+        }
 
-                    if (data.comm_percent > 75) {
-                        commDot.classList.add('status-good');
-                    } else if (data.comm_percent > 0) {
-                        commDot.classList.add('status-warn');
-                    } else {
-                        commDot.classList.add('status-bad');
-                    }
+        function colorForScore(score) {
+            const scaled = Math.min(Math.max(score, 0), 1) * (colorStops.length - 1);
+            const index = Math.min(Math.floor(scaled), colorStops.length - 2);
+            const fraction = scaled - index;
+            const start = colorStops[index];
+            const end = colorStops[index + 1];
+            return start.map((channel, i) => Math.floor(channel + (end[i] - channel) * fraction));
+        }
 
-                    commBadge.style.display = 'flex';
-                    switchView('heatmap');
-                    imgDisplay.style.display = 'block';
-                })
-                .catch(error => {
-                    statusText.innerText = "Scan failed.";
-                    alert(`System Error:\n${error.message}`);
-                });
+        function imageDataUrl(imageData) {
+            const canvas = document.createElement('canvas');
+            canvas.width = imageData.width;
+            canvas.height = imageData.height;
+            canvas.getContext('2d').putImageData(imageData, 0, 0);
+            return canvas.toDataURL('image/png');
+        }
+
+        function createRasterImages(sourceImage, { lat, degSpan, flatWeight, elevationWeight }) {
+            const original = new ImageData(GRID_SIZE, GRID_SIZE);
+            const heatmap = new ImageData(GRID_SIZE, GRID_SIZE);
+            const grayscale = new Float32Array(GRID_SIZE * GRID_SIZE);
+
+            for (let i = 0; i < grayscale.length; i++) {
+                const offset = i * 4;
+                const value = Math.round(
+                    sourceImage.data[offset] * 0.299 +
+                    sourceImage.data[offset + 1] * 0.587 +
+                    sourceImage.data[offset + 2] * 0.114
+                );
+                grayscale[i] = value;
+                original.data[offset] = value;
+                original.data[offset + 1] = value;
+                original.data[offset + 2] = value;
+                original.data[offset + 3] = 255;
+            }
+
+            for (let row = 0; row < GRID_SIZE; row++) {
+                const latitude = lat + degSpan / 2 - row * degSpan / (GRID_SIZE - 1);
+                const cosLatitude = Math.min(Math.max(Math.cos(latitude * Math.PI / 180), 0.01), 1);
+
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const index = row * GRID_SIZE + col;
+                    const gx = col === 0
+                        ? grayscale[index + 1] - grayscale[index]
+                        : col === GRID_SIZE - 1
+                            ? grayscale[index] - grayscale[index - 1]
+                            : (grayscale[index + 1] - grayscale[index - 1]) / 2;
+                    const gy = row === 0
+                        ? grayscale[index + GRID_SIZE] - grayscale[index]
+                        : row === GRID_SIZE - 1
+                            ? grayscale[index] - grayscale[index - GRID_SIZE]
+                            : (grayscale[index + GRID_SIZE] - grayscale[index - GRID_SIZE]) / 2;
+                    const slope = Math.sqrt((gx / cosLatitude) ** 2 + gy ** 2);
+                    const slopeNorm = Math.min(Math.max(slope / 20, 0), 1);
+                    const score = (1 - slopeNorm) * flatWeight +
+                        (grayscale[index] / 255) * elevationWeight;
+                    const [red, green, blue] = colorForScore(score);
+                    const offset = index * 4;
+                    heatmap.data[offset] = red;
+                    heatmap.data[offset + 1] = green;
+                    heatmap.data[offset + 2] = blue;
+                    heatmap.data[offset + 3] = 255;
+                }
+            }
+
+            return {
+                original: imageDataUrl(original),
+                heatmap: imageDataUrl(heatmap)
+            };
+        }
+
+        function getCommunicationEstimate(lon) {
+            const lonNormalized = (lon + 180) % 360 - 180;
+            const percentage = Math.round(Math.max(0, Math.cos(lonNormalized * Math.PI / 180)) * 100);
+            if (percentage > 75) {
+                return { percentage, status: 'Excellent (Direct Line of Sight)', className: 'status-good' };
+            }
+            if (percentage > 15) {
+                return { percentage, status: 'Marginal (Low Horizon Window)', className: 'status-warn' };
+            }
+            return { percentage: 0, status: 'No Signal (Far Side Shadow Zone)', className: 'status-bad' };
         }
 
         function switchView(viewType) {
-            const imgDisplay = document.getElementById('map-display');
             const btnHeatmap = document.getElementById('btn-heatmap');
             const btnOriginal = document.getElementById('btn-original');
 
             if (viewType === 'heatmap') {
                 imgDisplay.src = memoryImages.heatmap;
+                imgDisplay.alt = 'Terrain suitability heatmap based on the selected weights';
                 btnHeatmap.classList.add('active');
                 btnOriginal.classList.remove('active');
-            } else if (viewType === 'original') {
+            } else {
                 imgDisplay.src = memoryImages.original;
+                imgDisplay.alt = 'Grayscale USGS lunar terrain image used in the suitability calculation';
                 btnOriginal.classList.add('active');
                 btnHeatmap.classList.remove('active');
             }
+            imgDisplay.classList.remove('hidden');
         }
+
+        async function generateHeatmap() {
+            let inputs;
+            try {
+                inputs = getValidatedInputs();
+            } catch (error) {
+                statusText.textContent = error.message;
+                statusText.classList.remove('hidden');
+                return;
+            }
+
+            scanButton.disabled = true;
+            scanButton.textContent = 'Scanning...';
+            statusText.textContent = 'Fetching USGS terrain image and calculating suitability...';
+            statusText.classList.remove('hidden');
+            imgDisplay.classList.add('hidden');
+            toggleBar.classList.add('hidden');
+            commBadge.classList.add('hidden');
+
+            try {
+                const sourceImage = await fetchElevationImage(inputs);
+                memoryImages = createRasterImages(sourceImage, inputs);
+                const estimate = getCommunicationEstimate(inputs.lon);
+                document.getElementById('comm-text').textContent =
+                    `${estimate.status} (${estimate.percentage}%)`;
+                document.getElementById('comm-dot').className =
+                    `indicator-dot ${estimate.className}`;
+                commBadge.classList.remove('hidden');
+                statusText.classList.add('hidden');
+                toggleBar.classList.remove('hidden');
+                switchView('heatmap');
+            } catch (error) {
+                statusText.textContent = `Scan failed: ${error.message}`;
+                statusText.classList.remove('hidden');
+            } finally {
+                scanButton.disabled = false;
+                scanButton.textContent = 'Scan Surface Terrain';
+            }
+        }
+
+        scanButton.addEventListener('click', generateHeatmap);
+        document.getElementById('btn-heatmap').addEventListener('click', () => switchView('heatmap'));
+        document.getElementById('btn-original').addEventListener('click', () => switchView('original'));
     </script>
 
 </body>

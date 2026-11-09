@@ -108,7 +108,7 @@ Key concepts:
 ### 7. Settlement Suitability GIS 📍
 **File:** `Habitability.html`
 
-This page performs a simplified habitat suitability analysis by comparing terrain variables such as elevation and slope influence. It includes a heatmap view, a terrain map toggle, and a communication status badge. The interface allows users to explore how different terrain weights affect a candidate site.
+This page runs entirely in the browser and requests a 600 × 600 image from the USGS lunar WMS service; no Flask server or Python packages are needed. It uses image brightness as a relative elevation proxy and local image gradients as a flatness proxy, with a grayscale map toggle and simplified longitude-only communication estimate. These are educational heuristics, not engineering assessments, and fetching terrain imagery requires an internet connection.
 
 Key concepts:
 - Terrain suitability analysis
@@ -142,19 +142,13 @@ Einstein-Moon-Base-Camp/
 
 ## How to Run
 
-### Option 1: Open directly in a browser
+### Option 1: Use the live site
 
-Clone or download the repository and open `index.html` in a modern browser.
-
-```bash
-git clone https://github.com/Pieter-Smets/Einstein-Moon-Base-Camp.git
-cd Einstein-Moon-Base-Camp
-start index.html
-```
+Open the [published GitHub Pages site](https://pieter-smets.github.io/Einstein-Moon-Base-Camp/) in a modern browser.
 
 ### Option 2: Serve locally
 
-For a more reliable setup, serve the folder with a local web server:
+For local development, serve the folder with a local web server. Opening the files directly with `file://` may prevent browser features such as the settlement page's cross-origin USGS request or the service worker from working:
 
 ```bash
 cd Einstein-Moon-Base-Camp
