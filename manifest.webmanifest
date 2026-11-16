@@ -1,0 +1,14 @@
+{
+  "name": "Moonbase",
+  "short_name": "Moonbase",
+  "start_url": "moonbase.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#0b0c10",
+  "theme_color": "#0b0c10",
+  "icons": [
+    {"src": "moonbase-icon-180.png", "sizes": "180x180", "type": "image/png"},
+    {"src": "moonbase-icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
